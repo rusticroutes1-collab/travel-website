@@ -136,8 +136,7 @@ Web : www.rusticroutes.net
 
 function downloadPDF(){
 
-let content=document.getElementById("output").innerHTML
-
+let content=document.querySelector(".container").innerHTML
 let win=window.open("", "", "width=900,height=700")
 
 win.document.write(`
