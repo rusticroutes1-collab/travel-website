@@ -136,19 +136,48 @@ Web : www.rusticroutes.net
 
 function downloadPDF(){
 
-let content=document.querySelector(".container").innerHTML
-let win=window.open("", "", "width=900,height=700")
+let header = document.querySelector(".header").innerHTML
+let quotation = document.getElementById("output").innerHTML
+
+let win = window.open("", "", "width=900,height=700")
 
 win.document.write(`
 <html>
 <head>
 <title>Package Quotation</title>
 <style>
-body{font-family:Arial;padding:40px;}
+body{
+font-family:Arial;
+padding:40px;
+}
+
+.header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+h3{
+text-align:center;
+}
+
+hr{
+margin:15px 0;
+}
 </style>
 </head>
+
 <body>
-${content}
+
+<div class="header">
+${header}
+</div>
+
+<h3>PACKAGE QUOTATION</h3>
+
+${quotation}
+
 </body>
 </html>
 `)
