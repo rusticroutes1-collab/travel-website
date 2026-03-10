@@ -6,6 +6,7 @@
 
 <style>
 
+
 body{
 font-family:Arial;
 background:#f4f6f8;
@@ -52,7 +53,51 @@ justify-content:space-between;
 margin-bottom:25px;
 }
 
+h3{
+margin-top:25px;
+}
+
+hr{
+margin:25px 0;
+}
+
+@media print{
+
+body{
+background:white;
+padding:0;
+}
+
+.container{
+box-shadow:none;
+border:none;
+width:100%;
+max-width:100%;
+}
+
+button{
+display:none;
+}
+
+textarea,input{
+display:none;
+}
+
+#formArea{
+display:none;
+}
+
+.output{
+border:none;
+background:white;
+margin:0;
+padding:0;
+}
+
+}
+
 </style>
+
 
 </head>
 
@@ -255,7 +300,7 @@ window.print()
 </body>
 
 </html>
-@media print{
+
 
 body{
 background:white;
