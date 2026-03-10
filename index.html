@@ -58,8 +58,7 @@ margin-bottom:25px;
 
 <body>
 
-<div class="container">
-
+<div class="container" id="formArea">
 <div class="header">
 
 <img src="logo.png" style="height:70px;">
@@ -126,8 +125,7 @@ Web : www.rusticroutes.net
 <button onclick="generateQuotation()">Generate Quotation</button>
 <button onclick="downloadPDF()">Download PDF</button>
 
-<div class="output" id="output"></div>
-
+<div class="output" id="output" style="display:none;"></div>
 </div>
 
 <script>
@@ -169,6 +167,9 @@ let itinerary=lineBreak(document.getElementById("itinerary").value)
 
 let inclusions=listFormat(document.getElementById("inclusions").value)
 let exclusions=listFormat(document.getElementById("exclusions").value)
+
+document.getElementById("formArea").style.display="none";
+document.getElementById("output").style.display="block";
 
 document.getElementById("output").innerHTML = `
 
