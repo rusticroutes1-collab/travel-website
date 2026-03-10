@@ -57,6 +57,9 @@ margin:25px 0;
 /* PRINT SETTINGS */
 
 @media print{
+.header{
+padding-right:15px;
+}
 @page{
 size:A4;
 margin:20mm;
@@ -93,6 +96,22 @@ padding:0;
 }
 .header{
 padding-right:20px;
+}
+.header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+width:100%;
+}
+
+.header img{
+height:60px;
+}
+
+.header div{
+text-align:right;
+max-width:320px;
+line-height:1.4;
 }
 </style>
 
