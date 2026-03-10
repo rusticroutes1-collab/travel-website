@@ -134,33 +134,93 @@ Web : www.rusticroutes.net
 
 <script>
 
+<script>
+
+function listFormat(text){
+let items=text.split("\n")
+let html="<ul>"
+
+items.forEach(function(item){
+if(item.trim()!=""){
+html+="<li>"+item+"</li>"
+}
+})
+
+html+="</ul>"
+return html
+}
+
+function lineBreak(text){
+return text.replace(/\n/g,"<br>")
+}
+
+function generateQuotation(){
+
+let destination=document.getElementById("destination").value
+let pax=document.getElementById("pax").value
+let duration=document.getElementById("duration").value
+let date=document.getElementById("date").value
+let arrival=document.getElementById("arrival").value
+let departure=document.getElementById("departure").value
+
+let hotel1=lineBreak(document.getElementById("hotel1").value)
+let price1=document.getElementById("price1").value
+
+let hotel2=lineBreak(document.getElementById("hotel2").value)
+let price2=document.getElementById("price2").value
+
+let itinerary=lineBreak(document.getElementById("itinerary").value)
+
+let inclusions=listFormat(document.getElementById("inclusions").value)
+let exclusions=listFormat(document.getElementById("exclusions").value)
+
+document.getElementById("output").innerHTML = `
+<h2>Rustic Routes Holidays</h2>
+<h3>PACKAGE QUOTATION</h3>
+
+Destination : ${destination}<br>
+Pax : ${pax}<br>
+Duration : ${duration}<br>
+Travel Date : ${date}<br>
+
+Arrival : ${arrival}<br>
+Departure : ${departure}<br>
+
+<hr>
+
+<h3>Option 1</h3>
+${hotel1}<br><br>
+<b>Package Cost :</b> ${price1}
+
+<hr>
+
+<h3>Option 2</h3>
+${hotel2}<br><br>
+<b>Package Cost :</b> ${price2}
+
+<hr>
+
+<h3>Brief Itinerary</h3>
+${itinerary}
+
+<hr>
+
+<h3>Inclusions</h3>
+${inclusions}
+
+<hr>
+
+<h3>Exclusions</h3>
+${exclusions}
+`
+
+}
+
 function downloadPDF(){
-
-let content = document.getElementById("printArea").innerHTML;
-
-let win = window.open("", "", "width=900,height=700");
-
-win.document.write(`
-<html>
-<head>
-<title>Package Quotation</title>
-<style>
-body{
-font-family: Arial;
-padding:40px;
+window.print()
 }
-</style>
-</head>
-<body>
-${content}
-</body>
-</html>
-`);
 
-win.document.close();
-win.print();
-
-}
+</script>
 <script>
 
 function listFormat(text){
