@@ -92,20 +92,23 @@ margin:0;
 padding:0;
 }
 .header{
-display:table;
 width:100%;
+box-sizing:border-box;
+display:flex;
+align-items:flex-start;
+justify-content:space-between;
+gap:20px;
 }
 
 .header img{
-display:table-cell;
-vertical-align:top;
+max-width:200px;
+height:auto;
 }
 
 .header div{
-display:table-cell;
+max-width:300px;
 text-align:right;
-width:50%;
-}
+word-wrap:break-word;
 }
 </style>
 
