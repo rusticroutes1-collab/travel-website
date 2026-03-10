@@ -122,8 +122,31 @@ Web : www.rusticroutes.net
 <div class="output" id="output"></div>
 
 </div>
-
 <script>
+
+function listFormat(text){
+
+let items=text.split("\n")
+
+let html="<ul>"
+
+items.forEach(function(item){
+
+if(item.trim()!=""){
+html+="<li>"+item+"</li>"
+}
+
+})
+
+html+="</ul>"
+
+return html
+
+}
+
+function lineBreak(text){
+return text.replace(/\n/g,"<br>")
+}
 
 function generateQuotation(){
 
@@ -134,15 +157,16 @@ let date=document.getElementById("date").value
 let arrival=document.getElementById("arrival").value
 let departure=document.getElementById("departure").value
 
-let hotel1=document.getElementById("hotel1").value
+let hotel1=lineBreak(document.getElementById("hotel1").value)
 let price1=document.getElementById("price1").value
 
-let hotel2=document.getElementById("hotel2").value
+let hotel2=lineBreak(document.getElementById("hotel2").value)
 let price2=document.getElementById("price2").value
 
-let itinerary=document.getElementById("itinerary").value
-let inclusions=document.getElementById("inclusions").value
-let exclusions=document.getElementById("exclusions").value
+let itinerary=lineBreak(document.getElementById("itinerary").value)
+
+let inclusions=listFormat(document.getElementById("inclusions").value)
+let exclusions=listFormat(document.getElementById("exclusions").value)
 
 document.getElementById("output").innerHTML=
 
@@ -163,17 +187,17 @@ Departure : ${departure}<br>
 
 <h3>Option 1</h3>
 
-${hotel1}<br>
+${hotel1}<br><br>
 
-Package Cost : ${price1}
+<b>Package Cost :</b> ${price1}
 
 <hr>
 
 <h3>Option 2</h3>
 
-${hotel2}<br>
+${hotel2}<br><br>
 
-Package Cost : ${price2}
+<b>Package Cost :</b> ${price2}
 
 <hr>
 
@@ -198,7 +222,3 @@ ${exclusions}
 }
 
 </script>
-
-</body>
-
-</html>
