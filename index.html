@@ -1,14 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Rustic Routes Holidays - Package Quotation</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f8;
+padding:40px;
+}
+
+.container{
+background:white;
+max-width:900px;
+margin:auto;
+padding:30px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+input, textarea{
+width:100%;
+padding:8px;
+margin-top:5px;
+margin-bottom:15px;
+}
+
+button{
+padding:12px 18px;
+background:#2a7ae2;
+color:white;
+border:none;
+cursor:pointer;
+margin-top:10px;
+margin-right:10px;
+}
+
+.output{
+margin-top:30px;
+padding:25px;
+border:1px solid #ccc;
+background:#fafafa;
+}
+
+.header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:25px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<img src="logo.png" style="height:70px;">
+
+<div style="text-align:right;">
+
+<h2 style="margin:0;">Rustic Routes Holidays</h2>
+
+<p style="margin:3px 0;">
+Phone : +91 9811335942<br>
+Email : bookings@rusticroutes.net<br>
+Web : www.rusticroutes.net
+</p>
+
+</div>
+
+</div>
+
+<h3 style="text-align:center;">PACKAGE QUOTATION</h3>
+
+<label>Destination</label>
+<input id="destination">
+
+<label>Pax Details</label>
+<input id="pax">
+
+<label>Duration</label>
+<input id="duration">
+
+<label>Travel Date</label>
+<input id="date">
+
+<label>Arrival</label>
+<input id="arrival">
+
+<label>Departure</label>
+<input id="departure">
+
+<h3>Option 1</h3>
+
+<label>Hotel Details</label>
+<textarea id="hotel1"></textarea>
+
+<label>Package Cost</label>
+<input id="price1">
+
+<h3>Option 2</h3>
+
+<label>Hotel Details</label>
+<textarea id="hotel2"></textarea>
+
+<label>Package Cost</label>
+<input id="price2">
+
+<h3>Brief Itinerary</h3>
+<textarea id="itinerary"></textarea>
+
+<h3>Inclusions</h3>
+<textarea id="inclusions"></textarea>
+
+<h3>Exclusions</h3>
+<textarea id="exclusions"></textarea>
+
+<button onclick="generateQuotation()">Generate Quotation</button>
+<button onclick="downloadPDF()">Download PDF</button>
+
+<div class="output" id="output"></div>
+
+</div>
+
+<script>
+
 function listFormat(text){
-let items = text.split("\n")
-let html = "<ul>"
+let items=text.split("\n")
+let html="<ul>"
 
 items.forEach(function(item){
 if(item.trim()!=""){
-html += "<li>"+item+"</li>"
+html+="<li>"+item+"</li>"
 }
 })
 
-html += "</ul>"
+html+="</ul>"
 return html
 }
 
@@ -37,7 +171,9 @@ let inclusions=listFormat(document.getElementById("inclusions").value)
 let exclusions=listFormat(document.getElementById("exclusions").value)
 
 document.getElementById("output").innerHTML = `
+
 <h2>Rustic Routes Holidays</h2>
+
 <h3>PACKAGE QUOTATION</h3>
 
 Destination : ${destination}<br>
@@ -51,32 +187,47 @@ Departure : ${departure}<br>
 <hr>
 
 <h3>Option 1</h3>
+
 ${hotel1}<br><br>
+
 <b>Package Cost :</b> ${price1}
 
 <hr>
 
 <h3>Option 2</h3>
+
 ${hotel2}<br><br>
+
 <b>Package Cost :</b> ${price2}
 
 <hr>
 
 <h3>Brief Itinerary</h3>
+
 ${itinerary}
 
 <hr>
 
 <h3>Inclusions</h3>
+
 ${inclusions}
 
 <hr>
 
 <h3>Exclusions</h3>
+
 ${exclusions}
+
 `
+
 }
 
 function downloadPDF(){
 window.print()
 }
+
+</script>
+
+</body>
+
+</html>
