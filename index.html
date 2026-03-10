@@ -55,8 +55,7 @@ margin-bottom:25px;
 
 <body>
 
-<div class="container">
-
+<div class="container" id="printArea">
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:25px;">
 
 <img src="logo.png" style="height:70px;">
@@ -136,10 +135,9 @@ Web : www.rusticroutes.net
 
 function downloadPDF(){
 
-let header = document.querySelector(".header").innerHTML
-let quotation = document.getElementById("output").innerHTML
+let content = document.getElementById("printArea").innerHTML;
 
-let win = window.open("", "", "width=900,height=700")
+let win = window.open("", "", "width=900,height=700");
 
 win.document.write(`
 <html>
@@ -147,56 +145,19 @@ win.document.write(`
 <title>Package Quotation</title>
 <style>
 body{
-font-family:Arial;
+font-family: Arial;
 padding:40px;
-}
-
-.header{
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:20px;
-}
-
-h3{
-text-align:center;
-}
-
-hr{
-margin:15px 0;
 }
 </style>
 </head>
-
 <body>
-
-<div class="header">
-${header}
-</div>
-
-<h3>PACKAGE QUOTATION</h3>
-
-${quotation}
-
+${content}
 </body>
 </html>
-`)
+`);
 
-win.document.close()
-
-win.print()
-
-}
-
-</script>
-
-</body>
-</html>
-`)
-
-win.document.close()
-
-win.print()
+win.document.close();
+win.print();
 
 }
 <script>
