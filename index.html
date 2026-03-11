@@ -198,30 +198,16 @@ Web : www.rusticroutes.net
 <h3>Option 1</h3>
 
 <label>Hotel Details</label>
-<textarea id="hotel1"></textarea>
+<input type="text" id="hotel1">
 
 <label>Package Cost</label>
-<input id="price1">
+<input type="text" id="price1">
 
 <button type="button" onclick="addHotelOption()">+ Add Hotel Option</button>
 
-<div id="moreHotels"></div>
+<div id="hotelOptions"></div>
 
-<label>
-<input type="checkbox" id="toggleOption2" onchange="toggleOption2()"> Add Second Hotel Option
-</label>
 
-<div id="option2Fields" style="display:none;">
-
-<h3>Option 2</h3>
-
-<label>Option 2 Hotel</label>
-<input type="text" id="hotel2">
-
-<label>Package Cost Option 2</label>
-<input type="text" id="price2">
-
-</div>
 
 <h3>Brief Itinerary</h3>
 <textarea id="itinerary"></textarea>
@@ -243,6 +229,29 @@ Web : www.rusticroutes.net
 
 <script>
 
+let hotelCount = 1;
+
+function addHotelOption(){
+
+hotelCount++;
+
+let html = `
+<hr>
+
+<h3>Option ${hotelCount}</h3>
+
+<label>Hotel Details</label>
+<input type="text" id="hotel${hotelCount}">
+
+<label>Package Cost</label>
+<input type="text" id="price${hotelCount}">
+`;
+
+document.getElementById("hotelOptions").innerHTML += html;
+
+}
+
+function listFormat(text){
 function listFormat(text){
 let items=text.split("\n")
 let html="<ul>"
@@ -381,6 +390,7 @@ function toggleOption2() {
     fields.style.display = "none";
   }
 }
+  
 </script>
 
 </body>
