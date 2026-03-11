@@ -202,14 +202,20 @@ Web : www.rusticroutes.net
 
 <label>Package Cost</label>
 <input id="price1">
-
+<label>
+<input type="checkbox" id="toggleOption2" onchange="toggleOption2()"> Add Second Hotel Option
+</label>
 <h3>Option 2</h3>
 
-<label>Hotel Details</label>
-<textarea id="hotel2"></textarea>
+<div id="option2Fields" style="display:none;">
 
-<label>Package Cost</label>
-<input id="price2">
+<label>Option 2 Hotel</label>
+<input type="text" id="hotel2">
+
+<label>Package Cost Option 2</label>
+<input type="text" id="price2">
+
+</div>
 
 <h3>Brief Itinerary</h3>
 <textarea id="itinerary"></textarea>
@@ -346,7 +352,16 @@ ${exclusions}
 function downloadPDF(){
 window.print()
 }
+function toggleOption2() {
+  const fields = document.getElementById("option2Fields");
+  const checkbox = document.getElementById("toggleOption2");
 
+  if (checkbox.checked) {
+    fields.style.display = "block";
+  } else {
+    fields.style.display = "none";
+  }
+}
 </script>
 
 </body>
