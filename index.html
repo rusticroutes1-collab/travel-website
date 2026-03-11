@@ -258,12 +258,15 @@ return text.replace(/\n/g,"<br>")
 function generateQuotation(){
 function toggleOption2() {
   var option2 = document.getElementById("option2Fields");
+  var title = document.getElementById("option2Title");
   var checkbox = document.getElementById("toggleOption2");
 
   if (checkbox.checked) {
     option2.style.display = "block";
+    title.style.display = "block";
   } else {
     option2.style.display = "none";
+    title.style.display = "none";
   }
 }
 let destination=document.getElementById("destination").value
