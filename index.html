@@ -257,6 +257,7 @@ if(clean==="") continue;
 
 /* DESTINATION + DURATION */
 if(lower.includes("destination")){
+
 let val = clean.split(":")[1];
 
 if(val){
@@ -264,8 +265,7 @@ if(val){
 document.getElementById("destination").value = val.trim();
 
 let parts = val.split("+");
-
-let totalNights=0;
+let totalNights = 0;
 
 for(let j=0;j<parts.length;j++){
 
@@ -276,10 +276,27 @@ totalNights += parseInt(nightMatch[0]);
 }
 
 let city = parts[j].replace(/[0-9nN]/g,"").trim();
-if(city) cities.push(city);
+
+if(city){
+cities.push(city);
+}
 
 }
 
+if(totalNights>0){
+
+let days = totalNights + 1;
+
+document.getElementById("duration").value =
+totalNights + " Nights / " + days + " Days";
+
+}
+
+}
+
+continue;
+
+}
 if(totalNights>0){
 
 let days = totalNights+1;
