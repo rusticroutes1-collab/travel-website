@@ -325,10 +325,16 @@ continue;
 /* HOTEL LINES */
 if(section==="hotels"){
 
+if(lower.includes("package") || lower==="inclusions" || lower==="exclusions"){
+section="";
+}else{
+
 let h = document.getElementById("hotel1");
 
 if(h){
 h.value += (h.value ? "\n" : "") + clean;
+}
+
 }
 
 continue;
