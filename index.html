@@ -304,12 +304,16 @@ document.getElementById("date").value = dateMatch[0];
 }
 
 /* PAX */
-if(lower.includes("pax")){
+if(lower.startsWith("pax")){
+
 let val = clean.split(":")[1];
+
 if(val){
 document.getElementById("pax").value = val.trim();
 }
+
 continue;
+
 }
 
 /* HOTELS SECTION */
@@ -415,7 +419,9 @@ for(let i=2;i<=hotelCount;i++){
 let h=document.getElementById("hotel"+i);
 
 if(h && h.value){
+
 hotelHTML += "<br><br>"+h.value;
+
 }
 
 }
