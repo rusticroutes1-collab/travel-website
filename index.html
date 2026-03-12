@@ -294,8 +294,28 @@ let departure=document.getElementById("departure").value
 let hotel1=lineBreak(document.getElementById("hotel1").value)
 let price1=document.getElementById("price1").value
 
-let hotel2=lineBreak(document.getElementById("hotel2").value)
-let price2=document.getElementById("price2").value
+let extraHotels=""
+
+for(let i=2;i<=hotelCount;i++){
+
+let hotel=document.getElementById("hotel"+i)?.value
+let price=document.getElementById("price"+i)?.value
+
+if(hotel){
+
+extraHotels+=`
+<hr>
+
+<h3>Option ${i}</h3>
+
+${hotel}<br><br>
+
+<b>Package Cost :</b> ${price}
+`
+
+}
+
+}
 
 let itinerary=lineBreak(document.getElementById("itinerary").value)
 
@@ -345,7 +365,7 @@ Departure : ${departure}<br>
 ${hotel1}<br><br>
 
 <b>Package Cost :</b> ${price1}
-
+${extraHotels}
 ${hotel2 ? `
 <hr>
 <h3>Option 2</h3>
