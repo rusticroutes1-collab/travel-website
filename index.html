@@ -257,6 +257,7 @@ let lower = clean.toLowerCase();
 if(clean==="") continue;
 
 /* DESTINATION */
+
 if(lower.includes("destination")){
 
 let val = clean.split(":")[1];
@@ -266,7 +267,7 @@ if(val){
 document.getElementById("destination").value = val.trim();
 
 let parts = val.split("+");
-let totalNights = 0;
+let totalNights=0;
 
 for(let j=0;j<parts.length;j++){
 
@@ -284,8 +285,6 @@ cities.push(city);
 
 }
 
-if(totalNights>0){
-
 let days = totalNights + 1;
 
 document.getElementById("duration").value =
@@ -293,13 +292,11 @@ totalNights + " Nights / " + days + " Days";
 
 }
 
-}
-
 continue;
 
 }
 
-/* TRAVEL DATE */
+/* DATE */
 
 let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 
@@ -321,18 +318,32 @@ continue;
 
 }
 
+/* PACKAGE COST */
+
+if(lower.includes("package")){
+
+let price = clean.match(/[0-9,]+/);
+
+if(price){
+document.getElementById("price1").value = "₹"+price[0];
+}
+
+continue;
+
+}
+
 /* HOTEL SECTION */
 
-if(lower==="hotels"){
-section="hotels";
+if(lower.includes("hotel")){
+section="hotel";
 continue;
 }
 
 /* HOTEL LINES */
 
-if(section==="hotels"){
+if(section==="hotel"){
 
-if(lower.includes("package") || lower==="inclusions" || lower==="exclusions"){
+if(lower.includes("package") || lower.includes("inclusion") || lower.includes("exclusion")){
 section="";
 }else{
 
@@ -358,41 +369,23 @@ continue;
 
 }
 
-/* PACKAGE COST */
-
-if(lower.includes("package cost")){
-
-let price = clean.match(/\d+/);
-
-if(price){
-document.getElementById("price1").value = "₹"+price[0];
-}
-
-continue;
-
-}
-
 /* INCLUSIONS */
 
-if(lower==="inclusions"){
+if(lower.includes("inclusion")){
 section="inclusions";
 continue;
 }
 
 /* EXCLUSIONS */
 
-if(lower==="exclusions"){
+if(lower.includes("exclusion")){
 section="exclusions";
 continue;
 }
 
-/* INCLUSIONS TEXT */
-
 if(section==="inclusions"){
 inclusionsText += clean+"\n";
 }
-
-/* EXCLUSIONS TEXT */
 
 if(section==="exclusions"){
 exclusionsText += clean+"\n";
@@ -400,7 +393,7 @@ exclusionsText += clean+"\n";
 
 }
 
-/* ARRIVAL / DEPARTURE */
+/* ARRIVAL + DEPARTURE */
 
 if(cities.length>0){
 
@@ -409,7 +402,7 @@ document.getElementById("departure").value = cities[cities.length-1];
 
 }
 
-/* TEXTAREAS */
+/* APPLY TEXT */
 
 document.getElementById("inclusions").value = inclusionsText;
 document.getElementById("exclusions").value = exclusionsText;
