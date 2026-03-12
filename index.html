@@ -241,40 +241,50 @@ function smartParse(){
 
 alert("Parser started");
 
-let text=document.getElementById("roughQuote").value;
+let text = document.getElementById("roughQuote").value;
+let lines = text.split("\n");
 
-/* fill textareas */
-document.getElementById("inclusions").value=inclusionsText
-document.getElementById("itinerary").value=itineraryText
+let hotelIndex = 1;
+let inclusionsText = "";
+let itineraryText = "";
 
-}
-}
+for(let line of lines){
 
-function addHotelOption(){
+let clean = line.trim();
+let lower = clean.toLowerCase();
 
-hotelCount++;
+if(clean === "") continue;
 
-let html = `
-<div id="option${hotelCount}">
-<hr>
+/* detect hotels */
+if(lower.includes("hotel") || lower.includes("resort") || lower.includes("houseboat")){
 
-<h3>Option ${hotelCount}</h3>
-
-<label>Hotel Details</label>
-<input type="text" id="hotel${hotelCount}">
-
-<label>Package Cost</label>
-<input type="text" id="price${hotelCount}">
-
-<button type="button" onclick="removeHotelOption(${hotelCount})">Remove Option</button>
-
-</div>
-`;
-
-document.getElementById("hotelOptions").innerHTML += html;
-
+if(hotelIndex === 1){
+document.getElementById("hotel1").value = clean;
+}else{
+addHotelOption();
+document.getElementById("hotel"+hotelIndex).value = clean;
 }
 
+hotelIndex++;
+continue;
+}
+
+/* detect package cost */
+let priceMatch = clean.match(/\d{4,6}/);
+if(priceMatch){
+document.getElementById("price1").value = priceMatch[0];
+continue;
+}
+
+/* collect other lines */
+itineraryText += clean + "\n";
+
+}
+
+/* fill itinerary */
+document.getElementById("itinerary").value = itineraryText;
+
+}
 function removeHotelOption(num){
 
 let option = document.getElementById("option"+num);
