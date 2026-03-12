@@ -337,7 +337,6 @@ document.getElementById("price1").value = "₹"+price[0];
 }
 
 continue;
-
 }
 
 /* INCLUSIONS */
@@ -409,7 +408,17 @@ let date=document.getElementById("date").value
 let arrival=document.getElementById("arrival").value
 let departure=document.getElementById("departure").value
 
-let hotel1=document.getElementById("hotel1").value
+let hotelHTML = hotel1;
+
+for(let i=2;i<=hotelCount;i++){
+
+let h=document.getElementById("hotel"+i);
+
+if(h && h.value){
+hotelHTML += "<br><br>"+h.value;
+}
+
+}
 let price1=document.getElementById("price1").value
 
 let itinerary=document.getElementById("itinerary").value
@@ -434,7 +443,7 @@ document.getElementById("output").innerHTML = `
 
 <h3>Hotel</h3>
 
-${hotel1}<br><br>
+${hotelHTML}<br><br>
 
 <b>Package Cost :</b> ${price1}
 
@@ -448,8 +457,7 @@ ${itinerary}
 
 <h3>Inclusions</h3>
 
-${inclusions}
-
+${inclusions.split("\n").map(i => "<li>"+i+"</li>").join("")}
 <hr>
 
 <h3>Exclusions</h3>
