@@ -325,17 +325,11 @@ continue;
 /* HOTEL LINES */
 if(section==="hotels"){
 
-if(hotelIndex > 1){
-addHotelOption();
-}
-
-let h = document.getElementById("hotel"+hotelIndex);
+let h = document.getElementById("hotel1");
 
 if(h){
-h.value = clean;
+h.value += (h.value ? "\n" : "") + clean;
 }
-
-hotelIndex++;
 
 continue;
 
