@@ -322,7 +322,24 @@ if(lower==="hotels"){
 section="hotels";
 continue;
 }
+/* HOTEL LINES */
+if(section==="hotels"){
 
+if(hotelIndex > 1){
+addHotelOption();
+}
+
+let h = document.getElementById("hotel"+hotelIndex);
+
+if(h){
+h.value = clean;
+}
+
+hotelIndex++;
+
+continue;
+
+}
 /* PAX */
 if(lower.includes("pax")){
 let val = clean.split(":")[1];
