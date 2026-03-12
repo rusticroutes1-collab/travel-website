@@ -257,7 +257,16 @@ if(clean==="") continue;
 
 /* DESTINATION + DURATION */
 if(lower.includes("destination")){
+/* PAX DETAILS */
+let paxMatch = clean.match(/^pax\s*:\s*(.*)/i);
 
+if(paxMatch){
+
+document.getElementById("pax").value = paxMatch[1].trim();
+
+continue;
+
+}
 let val = clean.split(":")[1];
 
 if(val){
