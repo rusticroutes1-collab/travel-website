@@ -237,45 +237,88 @@ Web : www.rusticroutes.net
 
 let hotelCount = 1;
 
-<script>
-
-let hotelCount = 1;
-
 function smartParse(){
 
-   ...parser code...
+let text = document.getElementById("roughQuote").value;
+let lines = text.split("\n");
+
+let section="";
+let hotelIndex=1;
+let inclusionsText="";
+
+for(let i=0;i<lines.length;i++){
+
+let clean=lines[i].trim();
+let lower=clean.toLowerCase();
+
+if(clean==="") continue;
+
+/* destination */
+if(lower.includes("destination")){
+let val=clean.split(":")[1];
+if(val) document.getElementById("destination").value=val.trim();
+continue;
+}
+
+/* travel date */
+if(lower.includes("travel")){
+let val=clean.split(":")[1];
+if(val) document.getElementById("date").value=val.trim();
+continue;
+}
+
+/* pax */
+if(lower.includes("pax")){
+let val=clean.split(":")[1];
+if(val) document.getElementById("pax").value=val.trim();
+continue;
+}
+
+/* hotels section */
+if(lower==="hotels"){
+section="hotels";
+continue;
+}
+
+/* package cost */
+if(lower.includes("package")){
+let price=clean.match(/\d+/);
+if(price) document.getElementById("price1").value=price[0];
+continue;
+}
+
+/* inclusions */
+if(lower==="inclusions"){
+section="inclusions";
+continue;
+}
+
+/* hotel lines */
+if(section==="hotels"){
+
+if(hotelIndex===1){
+document.getElementById("hotel1").value=clean;
+}else{
+addHotelOption();
+document.getElementById("hotel"+hotelIndex).value=clean;
+}
+
+hotelIndex++;
+continue;
 
 }
 
-function addHotelOption(){
-
-   hotelCount++;
-
-   let html = `
-   <div id="option${hotelCount}">
-   ...
-   </div>
-   `;
-
-   document.getElementById("hotelOptions").innerHTML += html;
+/* inclusions lines */
+if(section==="inclusions"){
+inclusionsText+=clean+"\n";
+}
 
 }
 
-function removeHotelOption(num){
-
-   let option = document.getElementById("option"+num);
-
-   if(option){
-      option.remove();
-   }
+document.getElementById("inclusions").value=inclusionsText;
 
 }
 
-function downloadPDF(){
-   window.print();
-}
-
-</script>
 function addHotelOption(){
 
 hotelCount++;
@@ -304,7 +347,6 @@ window.print();
 }
 
 </script>
-
 
 </body>
 
