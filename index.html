@@ -236,6 +236,8 @@ function addHotelOption(){
 hotelCount++;
 
 let html = `
+<div id="option${hotelCount}">
+
 <hr>
 
 <h3>Option ${hotelCount}</h3>
@@ -245,12 +247,24 @@ let html = `
 
 <label>Package Cost</label>
 <input type="text" id="price${hotelCount}">
+
+<button type="button" onclick="removeHotelOption(${hotelCount})">Remove Option</button>
+
+</div>
 `;
 
 document.getElementById("hotelOptions").innerHTML += html;
 
 }
+function removeHotelOption(num){
 
+let option=document.getElementById("option"+num);
+
+if(option){
+option.remove();
+}
+
+}
 function listFormat(text){
 
 let items=text.split("\n")
