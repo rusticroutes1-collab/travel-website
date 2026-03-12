@@ -242,113 +242,101 @@ function smartParse(){
 let text = document.getElementById("roughQuote").value;
 let lines = text.split("\n");
 
-let section="";
 let inclusionsText="";
 let exclusionsText="";
+let section="";
+
+let cities=[];
 
 for(let i=0;i<lines.length;i++){
 
-let clean=lines[i].trim();
-let lower=clean.toLowerCase();
+let clean = lines[i].trim();
+let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
-/* Destination */
+/* detect cities from destination line */
 if(lower.includes("destination")){
-let val=clean.split(":")[1];
-if(val) document.getElementById("destination").value=val.trim();
+
+let val = clean.split(":")[1];
+if(val){
+
+document.getElementById("destination").value = val.trim();
+
+/* extract city names */
+let parts = val.split("+");
+
+for(let j=0;j<parts.length;j++){
+
+let city = parts[j].replace(/[0-9nN]/g,"").trim();
+if(city!=="") cities.push(city);
+
+}
+
+}
+
 continue;
 }
 
-/* Travel Date */
-if(lower.includes("travel")){
-let val=clean.split(":")[1];
-if(val) document.getElementById("date").value=val.trim();
-continue;
-}
-
-/* Pax */
+/* pax */
 if(lower.includes("pax")){
-let val=clean.split(":")[1];
-if(val) document.getElementById("pax").value=val.trim();
+
+let val = clean.split(":")[1];
+if(val) document.getElementById("pax").value = val.trim();
+
 continue;
 }
 
-/* Duration */
-if(lower.includes("night") || lower.includes("day")){
-document.getElementById("duration").value=clean;
-continue;
+/* duration */
+let nightMatch = clean.match(/\d+\s*[nN]/);
+let dayMatch = clean.match(/\d+\s*(day|days)/i);
+
+if(nightMatch || dayMatch){
+document.getElementById("duration").value = clean;
 }
 
-/* Arrival */
-if(lower.includes("arrival")){
-let val=clean.split(":")[1];
-if(val) document.getElementById("arrival").value=val.trim();
-continue;
-}
-
-/* Departure */
-if(lower.includes("departure")){
-let val=clean.split(":")[1];
-if(val) document.getElementById("departure").value=val.trim();
-continue;
-}
-
-/* Hotels */
-if(lower==="hotels"){
-section="hotels";
-continue;
-}
-
-/* Package Cost */
+/* package cost */
 if(lower.includes("package")){
-let price=clean.match(/\d+/);
-if(price) document.getElementById("price1").value=price[0];
+let price = clean.match(/\d+/);
+if(price){
+document.getElementById("price1").value = price[0];
+}
 continue;
 }
 
-/* Inclusions */
+/* inclusions section */
 if(lower==="inclusions"){
 section="inclusions";
 continue;
 }
 
-/* Exclusions */
+/* exclusions section */
 if(lower==="exclusions"){
 section="exclusions";
 continue;
 }
 
-/* Hotel lines */
-if(section==="hotels"){
-
-let hotelIndex=document.querySelectorAll("[id^='hotel']").length;
-
-if(hotelIndex===1){
-document.getElementById("hotel1").value=clean;
-}else{
-addHotelOption();
-document.getElementById("hotel"+hotelIndex).value=clean;
-}
-
-continue;
-
-}
-
-/* Inclusions lines */
+/* inclusions lines */
 if(section==="inclusions"){
-inclusionsText+=clean+"\n";
+inclusionsText += clean + "\n";
 }
 
-/* Exclusions lines */
+/* exclusions lines */
 if(section==="exclusions"){
-exclusionsText+=clean+"\n";
+exclusionsText += clean + "\n";
 }
 
 }
 
-document.getElementById("inclusions").value=inclusionsText;
-document.getElementById("exclusions").value=exclusionsText;
+/* set arrival and departure */
+if(cities.length>0){
+document.getElementById("arrival").value = cities[0];
+document.getElementById("departure").value = cities[cities.length-1];
+}
+
+/* fill textareas */
+document.getElementById("inclusions").value = inclusionsText;
+document.getElementById("exclusions").value = exclusionsText;
 
 }
 
