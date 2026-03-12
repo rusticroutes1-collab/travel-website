@@ -255,40 +255,40 @@ let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
-Destination : 2N Pattaya + 4N Bangkok
-Travel date : 22 May 2026
-Pax : 3 Adults
+/* DESTINATION + DURATION */
+if(lower.includes("destination")){
 
-Hotels
-Centara Nova Hotel Pattaya-Deluxe Triple pool view
-Baiyoke Sky Bangkok -Deluxe Sky Zone triple
+let val = clean.split(":")[1];
 
-Package Cost : ₹37800/- per pax on triple 
+if(val){
 
+document.getElementById("destination").value = val.trim();
 
-Inclusions
-02 Nights accommodation with breakfast at Pattaya
-03 Nights accommodation with breakfast at Bangkok
-Transfers
-Transfer From Donmuang Airport - Pattaya Hotel + En-route Visit Sri Racha Zoo with Meal(breakfast or lunch)
-Combo Floating Market + Tiger Park Transfer 
-Transfer From Pattaya Hotel - Bangkok Hotel Private 
-Transfer From Bangkok Hotel - Bangkok Airport 
-Tours
-Tiger Topia Show with breakfast 
-Coral Island Tour with Lunch by Speed Boat ,SIC
-Ripley's Believe it or Not with 3 Activity & Transfer 
-Tiger Park with Medium Tiger Ticket (Over 15 years. 160 cm+) 
-Floating Market Entry with Boat Ride 
-Chaopharaya Princess Dinner Cruise with Indian Buffet,Pvt
+let parts = val.split("+");
+let totalNights = 0;
 
+for(let j=0;j<parts.length;j++){
+
+let nightMatch = parts[j].match(/\d+/);
+
+if(nightMatch){
+totalNights += parseInt(nightMatch[0]);
+}
+
+let city = parts[j].replace(/[0-9nN]/g,"").trim();
+
+if(city){
+cities.push(city);
+}
+
+}
 
 if(totalNights>0){
 
-let days = totalNights+1;
+let days = totalNights + 1;
 
 document.getElementById("duration").value =
-totalNights+" Nights / "+days+" Days";
+totalNights + " Nights / " + days + " Days";
 
 }
 
@@ -297,7 +297,6 @@ totalNights+" Nights / "+days+" Days";
 continue;
 
 }
-
 /* TRAVEL DATE */
 let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 
