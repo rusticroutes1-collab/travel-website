@@ -239,31 +239,33 @@ let hotelCount = 1;
 
 function smartParse(){
 
-let text=document.getElementById("roughQuote").value
-let lines=text.split("\n")
+let text = document.getElementById("roughQuote").value;
+let lines = text.split("\n");
 
-let itineraryText=""
-let priceFound=false
+let itineraryText = "";
+let priceFound = false;
 
-for(let line of lines){
+for(let i=0;i<lines.length;i++){
 
-let clean=line.trim()
-if(clean==="") continue
+let clean = lines[i].trim();
+
+if(clean==="") continue;
 
 /* detect price */
-let priceMatch=clean.match(/\d{4,6}/)
+let priceMatch = clean.match(/\d{3,6}/);
 
 if(priceMatch && !priceFound){
-document.getElementById("price1").value=priceMatch[0]
-priceFound=true
+document.getElementById("price1").value = priceMatch[0];
+priceFound = true;
 }
 
-/* add everything to itinerary */
-itineraryText+=clean+"\n"
+/* collect itinerary */
+itineraryText += clean + "\n";
 
 }
 
-document.getElementById("itinerary").value=itineraryText
+/* fill itinerary box */
+document.getElementById("itinerary").value = itineraryText;
 
 }
 hotelIndex++;
