@@ -181,7 +181,7 @@ Web : www.rusticroutes.net
 <input id="destination">
 
 <label>Pax Details</label>
-<input id="pax">
+<input type="number" id="pax" placeholder="Enter number of passengers">
 
 <label>Duration</label>
 <input id="duration">
@@ -407,7 +407,12 @@ document.getElementById("hotelOptions").innerHTML += html;
 function generateQuotation(){
 
 let destination=document.getElementById("destination").value
-let pax=document.getElementById("pax").value
+let pax = document.getElementById("pax").value;
+
+let paxText = pax + " Adult";
+if(pax > 1){
+    paxText = pax + " Adults";
+}
 let duration=document.getElementById("duration").value
 let date=document.getElementById("date").value
 let arrival=document.getElementById("arrival").value
@@ -440,7 +445,7 @@ document.getElementById("output").innerHTML = `
 <h2 style="text-align:center">PACKAGE QUOTATION</h2>
 
 <b>Destination :</b> ${destination}<br>
-<b>Pax :</b> ${pax}<br>
+<b>Pax :</b> ${paxText}<br>
 <b>Duration :</b> ${duration}<br>
 <b>Travel Date :</b> ${date}<br>
 <b>Arrival :</b> ${arrival}<br>
