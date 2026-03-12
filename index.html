@@ -196,7 +196,13 @@ Web : www.rusticroutes.net
 <input id="departure">
 
 <h3>Option 1</h3>
+<h3>Paste Rough Quote</h3>
 
+<textarea id="roughQuote" placeholder="Paste rough quotation here" style="width:100%;height:120px;"></textarea>
+
+<button type="button" onclick="parseQuote()">Auto Fill Fields</button>
+
+<hr>
 <label>Hotel Details</label>
 <input type="text" id="hotel1">
 
@@ -428,7 +434,45 @@ function toggleOption2() {
     fields.style.display = "none";
   }
 }
-  
+  function parseQuote(){
+
+let text=document.getElementById("roughQuote").value
+
+let lines=text.split("\n")
+
+let hotelIndex=1
+
+for(let line of lines){
+
+if(line.toLowerCase().includes("hotel") || line.toLowerCase().includes("houseboat")){
+
+if(hotelIndex==1){
+
+document.getElementById("hotel1").value=line
+
+}else{
+
+addHotelOption()
+
+document.getElementById("hotel"+hotelIndex).value=line
+
+}
+
+hotelIndex++
+
+}
+
+let price=line.match(/\d{4,6}/)
+
+if(price){
+
+document.getElementById("price1").value=price[0]
+
+}
+
+}
+
+}
 </script>
 
 </body>
