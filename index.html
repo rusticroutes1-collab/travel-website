@@ -235,48 +235,37 @@ Web : www.rusticroutes.net
 
 <script>
 
-
 let hotelCount = 1;
 
 function smartParse(){
 
-let text=document.getElementById("roughQuote").value;
-let lines=text.split("\n");
+let text = document.getElementById("roughQuote").value;
+let lines = text.split("\n");
 
-let hotelIndex=1;
-let priceFound=false;
+let hotelIndex = 1;
+let priceFound = false;
 
 for(let line of lines){
 
-let clean=line.trim();
+let clean = line.trim();
+let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
-let lower=clean.toLowerCase();
+/* detect hotel lines */
+if(lower.includes("hotel") ||
+   lower.includes("houseboat") ||
+   lower.includes("resort") ||
+   lower.includes("camp")){
 
-/* detect hotels */
-if(
-lower.includes("hotel") ||
-lower.includes("houseboat") ||
-lower.includes("resort") ||
-lower.includes("camp")
-){
-
-if(hotelIndex===1){
-
-document.getElementById("hotel1").value=clean;
-
+if(hotelIndex === 1){
+document.getElementById("hotel1").value = clean;
 }else{
-
 addHotelOption();
-
-let field=document.getElementById("hotel"+hotelIndex);
-if(field){ field.value=clean; }
-
+document.getElementById("hotel"+hotelIndex).value = clean;
 }
 
 hotelIndex++;
-
 continue;
 
 }
@@ -284,11 +273,11 @@ continue;
 /* detect package cost only once */
 if(!priceFound){
 
-let priceMatch=clean.match(/\d{4,6}/);
+let priceMatch = clean.match(/\d{4,6}/);
 
 if(priceMatch){
-document.getElementById("price1").value=priceMatch[0];
-priceFound=true;
+document.getElementById("price1").value = priceMatch[0];
+priceFound = true;
 }
 
 }
@@ -323,120 +312,13 @@ document.getElementById("hotelOptions").innerHTML += html;
 }
 
 function removeHotelOption(num){
-let option=document.getElementById("option"+num);
-if(option){ option.remove(); }
+
+let option = document.getElementById("option"+num);
+
+if(option){
+option.remove();
 }
 
-function listFormat(text){
-let items=text.split("\n");
-let html="<ul>";
-
-items.forEach(function(item){
-if(item.trim()!=""){
-html+="<li>"+item+"</li>";
-}
-});
-
-html+="</ul>";
-return html;
-}
-
-function lineBreak(text){
-return text.replace(/\n/g,"<br>");
-}
-
-function generateQuotation(){
-
-let destination=document.getElementById("destination").value;
-let pax=document.getElementById("pax").value;
-let duration=document.getElementById("duration").value;
-let date=document.getElementById("date").value;
-let arrival=document.getElementById("arrival").value;
-let departure=document.getElementById("departure").value;
-
-let hotel1=lineBreak(document.getElementById("hotel1").value);
-let price1=document.getElementById("price1").value;
-
-let extraHotels="";
-
-for(let i=2;i<=hotelCount;i++){
-
-let hotel=document.getElementById("hotel"+i)?.value;
-let price=document.getElementById("price"+i)?.value;
-
-if(hotel){
-extraHotels+=`
-<hr>
-<h3>Option ${i} Hotel</h3>
-${hotel}<br><br>
-<b>Package Cost :</b> ${price}
-`;
-}
-
-}
-
-let itinerary=lineBreak(document.getElementById("itinerary").value);
-let inclusions=listFormat(document.getElementById("inclusions").value);
-let exclusions=listFormat(document.getElementById("exclusions").value);
-
-document.getElementById("formArea").style.display="none";
-document.getElementById("output").style.display="block";
-
-document.getElementById("output").innerHTML=`
-
-<div class="header">
-<img src="logo.png" style="height:70px">
-
-<div style="text-align:right">
-<h2 style="margin:0">Rustic Routes Holidays</h2>
-
-<p style="margin:3px 0">
-Phone : +91 9811335942<br>
-Email : bookings@rusticroutes.net<br>
-Web : www.rusticroutes.net
-</p>
-</div>
-
-</div>
-
-<hr>
-
-<h3 style="text-align:center">PACKAGE QUOTATION</h3>
-
-Destination : ${destination}<br>
-Pax : ${pax}<br>
-Duration : ${duration}<br>
-Travel Date : ${date}<br>
-
-Arrival : ${arrival}<br>
-Departure : ${departure}<br>
-
-<hr>
-
-${hotelCount==1 ? `
-<h3>Hotel</h3>
-${hotel1}<br><br>
-<b>Package Cost :</b> ${price1}
-` : `
-<h3>Option 1 Hotel</h3>
-${hotel1}<br><br>
-<b>Package Cost :</b> ${price1}
-${extraHotels}
-`}
-
-<h3>Brief Itinerary</h3>
-${itinerary}
-
-<hr>
-
-<h3>Inclusions</h3>
-${inclusions}
-
-<hr>
-
-<h3>Exclusions</h3>
-${exclusions}
-`;
 }
 
 function downloadPDF(){
@@ -444,7 +326,6 @@ window.print();
 }
 
 </script>
-
 
 
 </body>
