@@ -237,88 +237,45 @@ Web : www.rusticroutes.net
 
 let hotelCount = 1;
 
+<script>
+
+let hotelCount = 1;
+
 function smartParse(){
 
-let text = document.getElementById("roughQuote").value;
-let lines = text.split("\n");
-
-let section = "";
-let hotelIndex = 1;
-
-let inclusionsText = "";
-
-for(let i=0;i<lines.length;i++){
-
-let clean = lines[i].trim();
-let lower = clean.toLowerCase();
-
-if(clean==="") continue;
-
-/* Destination */
-if(lower.includes("destination")){
-document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
-continue;
-}
-
-/* Travel Date */
-if(lower.startsWith("travel date")){
-document.getElementById("date").value = clean.split(":")[1]?.trim() || "";
-continue;
-}
-
-/* Pax */
-if(lower.includes("pax")){
-document.getElementById("pax").value = clean.split(":")[1]?.trim() || "";
-continue;
-}
-
-/* Hotels section */
-if(lower === "hotels"){
-section = "hotels";
-continue;
-}
-
-/* Package Cost */
-if(lower.startsWith("package cost")){
-let price = clean.match(/\d+/);
-if(price){
-document.getElementById("price1").value = price[0];
-}
-continue;
-}
-
-/* Inclusions section */
-if(lower === "inclusions"){
-section = "inclusions";
-continue;
-}
-
-/* Hotel lines */
-if(section === "hotels"){
-
-if(hotelIndex === 1){
-document.getElementById("hotel1").value = clean;
-}else{
-addHotelOption();
-document.getElementById("hotel"+hotelIndex).value = clean;
-}
-
-hotelIndex++;
-continue;
+   ...parser code...
 
 }
 
-/* Inclusions lines */
-if(section === "inclusions"){
-inclusionsText += clean + "\n";
-}
+function addHotelOption(){
+
+   hotelCount++;
+
+   let html = `
+   <div id="option${hotelCount}">
+   ...
+   </div>
+   `;
+
+   document.getElementById("hotelOptions").innerHTML += html;
 
 }
 
-/* fill inclusions box */
-document.getElementById("inclusions").value = inclusionsText;
+function removeHotelOption(num){
+
+   let option = document.getElementById("option"+num);
+
+   if(option){
+      option.remove();
+   }
 
 }
+
+function downloadPDF(){
+   window.print();
+}
+
+</script>
 function addHotelOption(){
 
 hotelCount++;
