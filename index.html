@@ -402,15 +402,61 @@ document.getElementById("hotelOptions").innerHTML += html;
 }
 function generateQuotation(){
 
+let destination=document.getElementById("destination").value
+let pax=document.getElementById("pax").value
+let duration=document.getElementById("duration").value
+let date=document.getElementById("date").value
+let arrival=document.getElementById("arrival").value
+let departure=document.getElementById("departure").value
+
+let hotel1=document.getElementById("hotel1").value
+let price1=document.getElementById("price1").value
+
+let itinerary=document.getElementById("itinerary").value
+let inclusions=document.getElementById("inclusions").value
+let exclusions=document.getElementById("exclusions").value
+
 document.getElementById("formArea").style.display="none";
 document.getElementById("output").style.display="block";
 
-let hotel=document.getElementById("hotel1").value;
-let price=document.getElementById("price1").value;
+document.getElementById("output").innerHTML = `
 
-document.getElementById("output").innerHTML =
-"<h3>Hotel</h3>"+hotel+
-"<br><br><b>Package Cost :</b> "+price;
+<h2 style="text-align:center">PACKAGE QUOTATION</h2>
+
+<b>Destination :</b> ${destination}<br>
+<b>Pax :</b> ${pax}<br>
+<b>Duration :</b> ${duration}<br>
+<b>Travel Date :</b> ${date}<br>
+<b>Arrival :</b> ${arrival}<br>
+<b>Departure :</b> ${departure}<br>
+
+<hr>
+
+<h3>Hotel</h3>
+
+${hotel1}<br><br>
+
+<b>Package Cost :</b> ${price1}
+
+<hr>
+
+<h3>Brief Itinerary</h3>
+
+${itinerary}
+
+<hr>
+
+<h3>Inclusions</h3>
+
+${inclusions}
+
+<hr>
+
+<h3>Exclusions</h3>
+
+${exclusions}
+
+`
 
 }
 function downloadPDF(){
