@@ -428,13 +428,10 @@ for(let i=2;i<=hotelCount;i++){
 let h=document.getElementById("hotel"+i);
 
 if(h && h.value){
-
 hotelHTML += "<br><br>"+h.value;
-
 }
 
 }
-
 
 let itinerary=document.getElementById("itinerary").value
 let inclusions=document.getElementById("inclusions").value
@@ -479,7 +476,7 @@ ${inclusions.split("\n").map(i => "<li>"+i+"</li>").join("")}
 
 ${exclusions}
 
-`
+`;
 
 }
 function downloadPDF(){
