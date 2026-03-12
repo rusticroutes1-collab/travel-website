@@ -239,11 +239,12 @@ let hotelCount = 1;
 
 function smartParse(){
 
+let hotelIndex = 1;
+
 let text = document.getElementById("roughQuote").value;
 let lines = text.split("\n");
 
 let section="";
-let hotelIndex=1;
 let inclusionsText="";
 let exclusionsText="";
 let cities=[];
@@ -254,7 +255,6 @@ let clean = lines[i].trim();
 let lower = clean.toLowerCase();
 
 if(clean==="") continue;
-
 /* DESTINATION + DURATION */
 if(lower.includes("destination")){
 
@@ -329,9 +329,21 @@ if(lower.includes("package") || lower==="inclusions" || lower==="exclusions"){
 section="";
 }else{
 
-let h = document.getElementById("hotel1");
+let hotelIndex = 1;
+
+let h = document.getElementById("hotel"+hotelIndex);
 
 if(h){
+h.value = clean;
+
+hotelIndex++;
+
+let nextHotel = document.getElementById("hotel"+hotelIndex);
+
+if(!nextHotel){
+addHotel();
+}
+}
 h.value += (h.value ? "\n" : "") + clean;
 }
 
