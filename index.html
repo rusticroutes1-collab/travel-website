@@ -248,11 +248,10 @@ let priceFound = false;
 for(let i=0;i<lines.length;i++){
 
 let clean = lines[i].trim();
-
 if(clean==="") continue;
 
 /* detect price */
-let priceMatch = clean.match(/\d{3,6}/);
+let priceMatch = clean.match(/\d+/);
 
 if(priceMatch && !priceFound){
 document.getElementById("price1").value = priceMatch[0];
@@ -264,7 +263,7 @@ itineraryText += clean + "\n";
 
 }
 
-/* fill itinerary box */
+/* fill itinerary */
 document.getElementById("itinerary").value = itineraryText;
 
 }
