@@ -239,37 +239,62 @@ Web : www.rusticroutes.net
 let hotelCount = 1;
 
 function smartParse(){
-let text = document.getElementById("roughQuote").value;
-let lines = text.split("\n");
 
-let hotelIndex = 1;
+let text=document.getElementById("roughQuote").value;
+let lines=text.split("\n");
+
+let hotelIndex=1;
+let priceFound=false;
 
 for(let line of lines){
-let clean = line.trim();
 
+let clean=line.trim();
+
+if(clean==="") continue;
+
+let lower=clean.toLowerCase();
+
+/* detect hotels */
 if(
-clean.toLowerCase().includes("hotel") ||
-clean.toLowerCase().includes("houseboat") ||
-clean.toLowerCase().includes("resort")
+lower.includes("hotel") ||
+lower.includes("houseboat") ||
+lower.includes("resort") ||
+lower.includes("camp")
 ){
 
-if(hotelIndex === 1){
-document.getElementById("hotel1").value = clean;
+if(hotelIndex===1){
+
+document.getElementById("hotel1").value=clean;
+
 }else{
+
 addHotelOption();
-let field = document.getElementById("hotel"+hotelIndex);
-if(field){ field.value = clean; }
+
+let field=document.getElementById("hotel"+hotelIndex);
+if(field){ field.value=clean; }
+
 }
 
 hotelIndex++;
+
+continue;
+
 }
 
-let priceMatch = clean.match(/\d{4,6}/);
+/* detect package cost only once */
+if(!priceFound){
+
+let priceMatch=clean.match(/\d{4,6}/);
+
 if(priceMatch){
-document.getElementById("price1").value = priceMatch[0];
+document.getElementById("price1").value=priceMatch[0];
+priceFound=true;
 }
 
 }
+
+}
+
 }
 
 function addHotelOption(){
