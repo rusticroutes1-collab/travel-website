@@ -306,7 +306,9 @@ document.getElementById("date").value = dateMatch[0];
 /* PAX */
 if(lower.includes("pax")){
 let val = clean.split(":")[1];
-if(val) document.getElementById("pax").value = val.trim();
+if(val){
+document.getElementById("pax").value = val.trim();
+}
 continue;
 }
 
@@ -316,19 +318,13 @@ section="hotels";
 continue;
 }
 
-/* HOTEL LINES */
-if(section==="hotels"){
-
-if(hotelIndex===1){
-document.getElementById("hotel1").value = clean;
-}else{
-addHotelOption();
-document.getElementById("hotel"+hotelIndex).value = clean;
+/* PAX */
+if(lower.includes("pax")){
+let val = clean.split(":")[1];
+if(val){
+document.getElementById("pax").value = val.trim();
 }
-
-hotelIndex++;
 continue;
-
 }
 
 /* PACKAGE COST */
@@ -337,7 +333,7 @@ if(lower.includes("package cost")){
 let price = clean.match(/\d+/);
 
 if(price){
-document.getElementById("price1").value = price[0];
+document.getElementById("price1").value = "₹"+price[0];
 }
 
 continue;
@@ -404,7 +400,19 @@ let html = `
 document.getElementById("hotelOptions").innerHTML += html;
 
 }
+function generateQuotation(){
 
+document.getElementById("formArea").style.display="none";
+document.getElementById("output").style.display="block";
+
+let hotel=document.getElementById("hotel1").value;
+let price=document.getElementById("price1").value;
+
+document.getElementById("output").innerHTML =
+"<h3>Hotel</h3>"+hotel+
+"<br><br><b>Package Cost :</b> "+price;
+
+}
 function downloadPDF(){
 window.print();
 }
