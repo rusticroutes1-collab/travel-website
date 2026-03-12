@@ -255,7 +255,8 @@ let clean = lines[i].trim();
 let lower = clean.toLowerCase();
 
 if(clean==="") continue;
-/* DESTINATION + DURATION */
+
+/* DESTINATION */
 if(lower.includes("destination")){
 
 let val = clean.split(":")[1];
@@ -297,7 +298,9 @@ totalNights + " Nights / " + days + " Days";
 continue;
 
 }
+
 /* TRAVEL DATE */
+
 let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 
 if(dateMatch){
@@ -305,7 +308,8 @@ document.getElementById("date").value = dateMatch[0];
 }
 
 /* PAX */
-if(lower.startsWith("pax")){
+
+if(lower.includes("pax")){
 
 let val = clean.split(":")[1];
 
@@ -317,12 +321,15 @@ continue;
 
 }
 
-/* HOTELS SECTION */
+/* HOTEL SECTION */
+
 if(lower==="hotels"){
 section="hotels";
 continue;
 }
+
 /* HOTEL LINES */
+
 if(section==="hotels"){
 
 if(lower.includes("package") || lower==="inclusions" || lower==="exclusions"){
@@ -332,7 +339,9 @@ section="";
 let h = document.getElementById("hotel"+hotelIndex);
 
 if(h){
+
 h.value = clean;
+
 hotelIndex++;
 
 let nextHotel = document.getElementById("hotel"+hotelIndex);
@@ -348,16 +357,9 @@ addHotel();
 continue;
 
 }
-/* PAX */
-if(lower.includes("pax")){
-let val = clean.split(":")[1];
-if(val){
-document.getElementById("pax").value = val.trim();
-}
-continue;
-}
 
 /* PACKAGE COST */
+
 if(lower.includes("package cost")){
 
 let price = clean.match(/\d+/);
@@ -367,26 +369,31 @@ document.getElementById("price1").value = "₹"+price[0];
 }
 
 continue;
+
 }
 
 /* INCLUSIONS */
+
 if(lower==="inclusions"){
 section="inclusions";
 continue;
 }
 
 /* EXCLUSIONS */
+
 if(lower==="exclusions"){
 section="exclusions";
 continue;
 }
 
 /* INCLUSIONS TEXT */
+
 if(section==="inclusions"){
 inclusionsText += clean+"\n";
 }
 
 /* EXCLUSIONS TEXT */
+
 if(section==="exclusions"){
 exclusionsText += clean+"\n";
 }
@@ -394,6 +401,7 @@ exclusionsText += clean+"\n";
 }
 
 /* ARRIVAL / DEPARTURE */
+
 if(cities.length>0){
 
 document.getElementById("arrival").value = cities[0];
@@ -402,11 +410,11 @@ document.getElementById("departure").value = cities[cities.length-1];
 }
 
 /* TEXTAREAS */
+
 document.getElementById("inclusions").value = inclusionsText;
 document.getElementById("exclusions").value = exclusionsText;
 
 }
-
 function addHotelOption(){
 
 hotelCount++;
