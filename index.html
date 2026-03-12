@@ -329,7 +329,6 @@ if(lower.includes("package") || lower==="inclusions" || lower==="exclusions"){
 section="";
 }else{
 
-let hotelIndex = 1;
 
 let h = document.getElementById("hotel"+hotelIndex);
 
@@ -344,7 +343,6 @@ if(!nextHotel){
 addHotel();
 }
 }
-h.value += (h.value ? "\n" : "") + clean;
 }
 
 }
