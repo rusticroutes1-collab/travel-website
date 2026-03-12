@@ -244,10 +244,8 @@ let lines = text.split("\n");
 
 let section="";
 let hotelIndex=1;
-
 let inclusionsText="";
 let exclusionsText="";
-
 let cities=[];
 
 for(let i=0;i<lines.length;i++){
@@ -257,56 +255,69 @@ let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
-/* Destination */
+/* DESTINATION + DURATION */
 if(lower.includes("destination")){
 
 let val = clean.split(":")[1];
+
 if(val){
 
 document.getElementById("destination").value = val.trim();
 
 let parts = val.split("+");
 
+let totalNights=0;
+
 for(let j=0;j<parts.length;j++){
 
+let nightMatch = parts[j].match(/\d+/);
+
+if(nightMatch){
+totalNights += parseInt(nightMatch[0]);
+}
+
 let city = parts[j].replace(/[0-9nN]/g,"").trim();
-if(city!=="") cities.push(city);
+if(city) cities.push(city);
+
+}
+
+if(totalNights>0){
+
+let days = totalNights+1;
+
+document.getElementById("duration").value =
+totalNights+" Nights / "+days+" Days";
 
 }
 
 }
 
 continue;
+
 }
 
-/* Travel Date */
+/* TRAVEL DATE */
 let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
+
 if(dateMatch){
 document.getElementById("date").value = dateMatch[0];
 }
 
-/* Pax */
+/* PAX */
 if(lower.includes("pax")){
 let val = clean.split(":")[1];
 if(val) document.getElementById("pax").value = val.trim();
 continue;
 }
 
-/* Duration only from Destination line */
-if(lower.includes("destination")){
-document.getElementById("duration").value = clean.split(":")[1]?.trim();
-}
-
-/* Hotels section */
-if(lower === "hotels"){
+/* HOTELS SECTION */
+if(lower==="hotels"){
 section="hotels";
 continue;
 }
 
-/* Hotel lines */
+/* HOTEL LINES */
 if(section==="hotels"){
-
-if(clean.toLowerCase().includes("hotel") || clean.toLowerCase().includes("resort")){
 
 if(hotelIndex===1){
 document.getElementById("hotel1").value = clean;
@@ -316,55 +327,61 @@ document.getElementById("hotel"+hotelIndex).value = clean;
 }
 
 hotelIndex++;
-
-}
-
 continue;
+
 }
 
-/* Package Cost */
+/* PACKAGE COST */
 if(lower.includes("package cost")){
+
 let price = clean.match(/\d+/);
+
 if(price){
 document.getElementById("price1").value = price[0];
 }
+
 continue;
+
 }
 
-/* Inclusions */
+/* INCLUSIONS */
 if(lower==="inclusions"){
 section="inclusions";
 continue;
 }
 
-/* Exclusions */
+/* EXCLUSIONS */
 if(lower==="exclusions"){
 section="exclusions";
 continue;
 }
 
-/* Inclusions lines */
+/* INCLUSIONS TEXT */
 if(section==="inclusions"){
-inclusionsText += clean + "\n";
+inclusionsText += clean+"\n";
 }
 
-/* Exclusions lines */
+/* EXCLUSIONS TEXT */
 if(section==="exclusions"){
-exclusionsText += clean + "\n";
+exclusionsText += clean+"\n";
 }
 
 }
 
-/* Arrival & Departure */
+/* ARRIVAL / DEPARTURE */
 if(cities.length>0){
+
 document.getElementById("arrival").value = cities[0];
 document.getElementById("departure").value = cities[cities.length-1];
+
 }
 
+/* TEXTAREAS */
 document.getElementById("inclusions").value = inclusionsText;
 document.getElementById("exclusions").value = exclusionsText;
 
 }
+
 function addHotelOption(){
 
 hotelCount++;
@@ -393,7 +410,6 @@ window.print();
 }
 
 </script>
-
 </body>
 
 </html>
