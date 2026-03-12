@@ -242,7 +242,10 @@ function smartParse(){
 let text = document.getElementById("roughQuote").value;
 let lines = text.split("\n");
 
+let section = "";
 let hotelIndex = 1;
+let itineraryText = "";
+let inclusionsText = "";
 let priceFound = false;
 
 for(let line of lines){
@@ -252,13 +255,45 @@ let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
-/* detect hotel lines */
-if(lower.includes("hotel") ||
-   lower.includes("houseboat") ||
-   lower.includes("resort") ||
-   lower.includes("camp")){
+/* detect sections */
+if(lower.startsWith("destination")){
+document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
+continue;
+}
 
-if(hotelIndex === 1){
+if(lower.startsWith("travel date")){
+document.getElementById("date").value = clean.split(":")[1]?.trim() || "";
+continue;
+}
+
+if(lower.startsWith("pax")){
+document.getElementById("pax").value = clean.split(":")[1]?.trim() || "";
+continue;
+}
+
+if(lower.startsWith("hotels")){
+section="hotels";
+continue;
+}
+
+if(lower.startsWith("package cost")){
+let priceMatch = clean.match(/\d{4,6}/);
+if(priceMatch){
+document.getElementById("price1").value = priceMatch[0];
+priceFound = true;
+}
+continue;
+}
+
+if(lower.startsWith("inclusions")){
+section="inclusions";
+continue;
+}
+
+/* hotel section */
+if(section==="hotels"){
+
+if(hotelIndex===1){
 document.getElementById("hotel1").value = clean;
 }else{
 addHotelOption();
@@ -267,20 +302,22 @@ document.getElementById("hotel"+hotelIndex).value = clean;
 
 hotelIndex++;
 continue;
+}
+
+/* inclusions section */
+if(section==="inclusions"){
+inclusionsText += clean + "\n";
+continue;
+}
+
+/* other lines -> itinerary */
+itineraryText += clean + "\n";
 
 }
 
-/* detect package cost only once */
-if(!priceFound){
-
-let priceMatch = clean.match(/\d{4,6}/);
-
-if(priceMatch){
-document.getElementById("price1").value = priceMatch[0];
-priceFound = true;
-}
-
-}
+/* fill textareas */
+document.getElementById("inclusions").value = inclusionsText;
+document.getElementById("itinerary").value = itineraryText;
 
 }
 
