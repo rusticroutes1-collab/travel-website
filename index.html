@@ -235,7 +235,69 @@ Web : www.rusticroutes.net
 <script>
 
 let hotelCount = 1;
+let hotelCount = 1;
 
+function smartParse(){
+
+let text=document.getElementById("roughQuote").value
+let lines=text.split("\n")
+
+let hotelIndex=1
+
+for(let line of lines){
+
+let clean=line.trim()
+
+if(clean.toLowerCase().includes("hotel") ||
+clean.toLowerCase().includes("houseboat") ||
+clean.toLowerCase().includes("resort")){
+
+if(hotelIndex==1){
+
+document.getElementById("hotel1").value=clean
+
+}else{
+
+addHotelOption()
+
+let h=document.getElementById("hotel"+hotelIndex)
+
+if(h){h.value=clean}
+
+}
+
+hotelIndex++
+
+}
+
+let priceMatch=clean.match(/\d{4,6}/)
+
+if(priceMatch){
+document.getElementById("price1").value=priceMatch[0]
+}
+
+}
+
+}
+
+
+function addHotelOption(){
+
+hotelCount++;
+
+let html = `
+<div id="option${hotelCount}">
+
+<hr>
+
+<h3>Option ${hotelCount}</h3>
+
+<label>Hotel Details</label>
+<input type="text" id="hotel${hotelCount}">
+
+<label>Package Cost</label>
+<input type="text" id="price${hotelCount}">
+`;
 function addHotelOption(){
 
 hotelCount++;
@@ -480,9 +542,10 @@ document.getElementById("price1").value=price[0]
 }
 <script>
 
+
 function smartParse(){
 
-let text=document.getElementById("roughQuote").value.toLowerCase()
+let text=document.getElementById("roughQuote").value
 let lines=text.split("\n")
 
 let hotelIndex=1
@@ -491,7 +554,9 @@ for(let line of lines){
 
 let clean=line.trim()
 
-if(clean.includes("hotel") || clean.includes("houseboat") || clean.includes("resort")){
+if(clean.toLowerCase().includes("hotel") ||
+clean.toLowerCase().includes("houseboat") ||
+clean.toLowerCase().includes("resort")){
 
 if(hotelIndex==1){
 
@@ -522,7 +587,7 @@ document.getElementById("price1").value=priceMatch[0]
 }
 
 </script>
-</script>
+
 
 </body>
 
