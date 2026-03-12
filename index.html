@@ -255,7 +255,7 @@ let lower = clean.toLowerCase();
 if(clean==="") continue;
 
 /* Destination */
-if(lower.startsWith("destination")){
+if(lower.includes("destination")){
 document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
 continue;
 }
@@ -267,7 +267,7 @@ continue;
 }
 
 /* Pax */
-if(lower.startsWith("pax")){
+if(lower.includes("pax")){
 document.getElementById("pax").value = clean.split(":")[1]?.trim() || "";
 continue;
 }
