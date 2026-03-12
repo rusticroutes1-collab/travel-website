@@ -542,38 +542,42 @@ document.getElementById("price1").value=price[0]
 <script>
 
 function smartParse(){
-  alert("Parser running");   // temporary test
 
-  let text = document.getElementById("roughQuote").value;
-  let lines = text.split("\n");
+alert("Smart parser started");
 
-  let hotelIndex = 1;
+let text=document.getElementById("roughQuote").value
+let lines=text.split("\n")
 
-  for(let line of lines){
-    let clean = line.trim();
+let hotelIndex=1
 
-    if(clean.toLowerCase().includes("hotel") ||
-       clean.toLowerCase().includes("houseboat") ||
-       clean.toLowerCase().includes("resort")){
+for(let line of lines){
 
-      if(hotelIndex == 1){
-        document.getElementById("hotel1").value = clean;
-      } else {
-        addHotelOption();
-        let h = document.getElementById("hotel"+hotelIndex);
-        if(h){ h.value = clean; }
-      }
+let clean=line.trim()
 
-      hotelIndex++;
-    }
+if(clean.toLowerCase().includes("hotel") ||
+clean.toLowerCase().includes("houseboat") ||
+clean.toLowerCase().includes("resort")){
 
-    let priceMatch = clean.match(/\d{4,6}/);
-    if(priceMatch){
-      document.getElementById("price1").value = priceMatch[0];
-    }
-  }
+if(hotelIndex==1){
+document.getElementById("hotel1").value=clean
+}else{
+addHotelOption()
+document.getElementById("hotel"+hotelIndex).value=clean
 }
 
+hotelIndex++
+
+}
+
+let priceMatch=clean.match(/\d{4,6}/)
+
+if(priceMatch){
+document.getElementById("price1").value=priceMatch[0]
+}
+
+}
+
+}
 </script>
 
 
