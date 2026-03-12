@@ -239,86 +239,9 @@ let hotelCount = 1;
 
 function smartParse(){
 
-let text=document.getElementById("roughQuote").value
-let lines=text.split("\n")
+alert("Parser started");
 
-let section=""
-let hotelIndex=1
-
-let inclusionsText=""
-let itineraryText=""
-
-for(let line of lines){
-
-let clean=line.trim()
-let lower=clean.toLowerCase()
-
-if(clean==="") continue
-
-/* destination */
-if(lower.startsWith("destination")){
-document.getElementById("destination").value=clean.split(":")[1]?.trim() || ""
-continue
-}
-
-/* travel date */
-if(lower.startsWith("travel date")){
-document.getElementById("date").value=clean.split(":")[1]?.trim() || ""
-continue
-}
-
-/* pax */
-if(lower.startsWith("pax")){
-document.getElementById("pax").value=clean.split(":")[1]?.trim() || ""
-continue
-}
-
-/* hotels section */
-if(lower==="hotels"){
-section="hotels"
-continue
-}
-
-/* package cost */
-if(lower.startsWith("package cost")){
-let price=clean.match(/\d+/)
-if(price){
-document.getElementById("price1").value=price[0]
-}
-continue
-}
-
-/* inclusions section */
-if(lower==="inclusions"){
-section="inclusions"
-continue
-}
-
-/* hotel lines */
-if(section==="hotels"){
-
-if(hotelIndex===1){
-document.getElementById("hotel1").value=clean
-}else{
-addHotelOption()
-document.getElementById("hotel"+hotelIndex).value=clean
-}
-
-hotelIndex++
-continue
-
-}
-
-/* inclusions */
-if(section==="inclusions"){
-inclusionsText+=clean+"\n"
-continue
-}
-
-/* remaining lines → itinerary */
-itineraryText+=clean+"\n"
-
-}
+let text=document.getElementById("roughQuote").value;
 
 /* fill textareas */
 document.getElementById("inclusions").value=inclusionsText
