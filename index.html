@@ -320,8 +320,7 @@ if(hotel){
 extraHotels+=`
 <hr>
 
-<h3>Option ${i}</h3>
-
+<h3>Option ${i} Hotel</h3>
 ${hotel}<br><br>
 
 <b>Package Cost :</b> ${price}
@@ -374,13 +373,27 @@ Departure : ${departure}<br>
 
 <hr>
 
-<h3>Option 1</h3>
+${hotelCount==1 ? `
+
+<h3>Hotel</h3>
 
 ${hotel1}<br><br>
 
 <b>Package Cost :</b> ${price1}
+
+` : `
+
+<hr>
+
+<h3>Option 1 Hotel</h3>
+
+${hotel1}<br><br>
+
+<b>Package Cost :</b> ${price1}
+
 ${extraHotels}
 
+`}
 
 <h3>Brief Itinerary</h3>
 
