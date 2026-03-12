@@ -242,31 +242,83 @@ function smartParse(){
 let text = document.getElementById("roughQuote").value;
 let lines = text.split("\n");
 
-let itinerary = "";
-let priceFound = false;
+let section = "";
+let hotelIndex = 1;
+
+let inclusionsText = "";
 
 for(let i=0;i<lines.length;i++){
 
-let line = lines[i].trim();
-if(line==="") continue;
+let clean = lines[i].trim();
+let lower = clean.toLowerCase();
 
-/* detect price */
-let price = line.match(/\d+/);
+if(clean==="") continue;
 
-if(price && !priceFound){
+/* Destination */
+if(lower.startsWith("destination")){
+document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
+continue;
+}
+
+/* Travel Date */
+if(lower.startsWith("travel date")){
+document.getElementById("date").value = clean.split(":")[1]?.trim() || "";
+continue;
+}
+
+/* Pax */
+if(lower.startsWith("pax")){
+document.getElementById("pax").value = clean.split(":")[1]?.trim() || "";
+continue;
+}
+
+/* Hotels section */
+if(lower === "hotels"){
+section = "hotels";
+continue;
+}
+
+/* Package Cost */
+if(lower.startsWith("package cost")){
+let price = clean.match(/\d+/);
+if(price){
 document.getElementById("price1").value = price[0];
-priceFound = true;
+}
+continue;
 }
 
-/* send everything to itinerary */
-itinerary += line + "\n";
+/* Inclusions section */
+if(lower === "inclusions"){
+section = "inclusions";
+continue;
+}
+
+/* Hotel lines */
+if(section === "hotels"){
+
+if(hotelIndex === 1){
+document.getElementById("hotel1").value = clean;
+}else{
+addHotelOption();
+document.getElementById("hotel"+hotelIndex).value = clean;
+}
+
+hotelIndex++;
+continue;
 
 }
 
-document.getElementById("itinerary").value = itinerary;
+/* Inclusions lines */
+if(section === "inclusions"){
+inclusionsText += clean + "\n";
+}
 
 }
 
+/* fill inclusions box */
+document.getElementById("inclusions").value = inclusionsText;
+
+}
 function addHotelOption(){
 
 hotelCount++;
