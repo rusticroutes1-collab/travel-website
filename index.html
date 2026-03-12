@@ -390,7 +390,13 @@ ${hotel1}<br><br>
 ` : `
 
 <hr>
+<h3>Smart Paste (Auto Fill Quote)</h3>
 
+<textarea id="roughQuote" placeholder="Paste rough quotation here..." style="width:100%;height:140px;"></textarea>
+
+<button type="button" onclick="smartParse()">Auto Fill Quote</button>
+
+<hr>
 <h3>Option 1 Hotel</h3>
 
 ${hotel1}<br><br>
@@ -478,6 +484,56 @@ document.getElementById("price1").value=price[0]
 </body>
 
 </html>
+function smartParse(){
 
+let text=document.getElementById("roughQuote").value.toLowerCase()
+
+let lines=text.split("\n")
+
+let hotelIndex=1
+
+for(let line of lines){
+
+let clean=line.trim()
+
+if(clean.includes("hotel") || clean.includes("houseboat") || clean.includes("resort")){
+
+if(hotelIndex==1){
+
+document.getElementById("hotel1").value=clean
+
+}else{
+
+addHotelOption()
+
+let h=document.getElementById("hotel"+hotelIndex)
+
+if(h){h.value=clean}
+
+}
+
+hotelIndex++
+
+}
+
+let priceMatch=clean.match(/\d{4,6}/)
+
+if(priceMatch){
+
+document.getElementById("price1").value=priceMatch[0]
+
+}
+
+if(clean.includes("etios") || clean.includes("innova") || clean.includes("swift")){
+
+let t=document.getElementById("transport")
+
+if(t){t.value=clean}
+
+}
+
+}
+
+}
 
 
