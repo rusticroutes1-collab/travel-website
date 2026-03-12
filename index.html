@@ -329,12 +329,10 @@ if(lower.includes("package") || lower==="inclusions" || lower==="exclusions"){
 section="";
 }else{
 
-
 let h = document.getElementById("hotel"+hotelIndex);
 
 if(h){
 h.value = clean;
-
 hotelIndex++;
 
 let nextHotel = document.getElementById("hotel"+hotelIndex);
@@ -342,7 +340,7 @@ let nextHotel = document.getElementById("hotel"+hotelIndex);
 if(!nextHotel){
 addHotel();
 }
-}
+
 }
 
 }
