@@ -472,22 +472,23 @@ let aiText = data.choices[0].message.content;
 
 aiText = aiText.replace(/```json/g,'').replace(/```/g,'');
 let aiData = JSON.parse(aiText);
+
 /* PAX */
 
-if(aiData.pax){
-document.getElementById("pax").value = aiData.pax;
+if(aiData.pax && document.getElementById("pax")){
+document.getElementById("pax").value = parseInt(aiData.pax);
 }
 
 /* ADULTS */
 
-if(aiData.adults){
-document.getElementById("adults").value = aiData.adults;
+if(aiData.adults && document.getElementById("adults")){
+document.getElementById("adults").value = parseInt(aiData.adults);
 }
 
 /* CHILDREN */
 
-if(aiData.children){
-document.getElementById("children").value = aiData.children;
+if(aiData.children && document.getElementById("children")){
+document.getElementById("children").value = parseInt(aiData.children);
 }
 /* AUTO CALCULATE PAX */
 
