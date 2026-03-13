@@ -372,28 +372,29 @@ continue;
 }
 /* INCLUSIONS */
 
-if(lower==="inclusions"){
+if(lower.startsWith("inclusions")){
 section="inclusions";
 continue;
 }
 
 /* EXCLUSIONS */
 
-if(lower==="exclusions"){
+if(lower.startsWith("exclusions")){
 section="exclusions";
 continue;
 }
 
+/* COLLECT INCLUSIONS */
+
 if(section==="inclusions"){
-inclusionsText += clean+"\n";
+inclusionsText += clean + "\n";
 }
+
+/* COLLECT EXCLUSIONS */
 
 if(section==="exclusions"){
-exclusionsText += clean+"\n";
+exclusionsText += clean + "\n";
 }
-
-}
-
 /* ARRIVAL + DEPARTURE */
 
 if(cities.length>0){
