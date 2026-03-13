@@ -457,7 +457,7 @@ model:"gpt-4.1-mini",
 messages:[
 {
 role:"system",
-content:"Extract travel quotation details from the text and return ONLY JSON in this format: {destination:'', duration:'', travelDate:'', arrival:'', departure:'', packageCost:'', hotels:[], hotelOptions:[], inclusions:[], itinerary:[], transport:'', adults:'', children:''}"
+content:"Extract travel quotation details from the text and return ONLY JSON in this format: {destination:'', duration:'', travelDate:'', arrival:'', departure:'', packageCost:'', hotels:[], hotelOptions:[], inclusions:[], itinerary:[], transport:'', pax:'', adults:'', children:''}"
 },
 {
 role:"user",
@@ -472,7 +472,36 @@ let aiText = data.choices[0].message.content;
 
 aiText = aiText.replace(/```json/g,'').replace(/```/g,'');
 let aiData = JSON.parse(aiText);
+/* PAX */
 
+if(aiData.pax){
+document.getElementById("pax").value = aiData.pax;
+}
+
+/* ADULTS */
+
+if(aiData.adults){
+document.getElementById("adults").value = aiData.adults;
+}
+
+/* CHILDREN */
+
+if(aiData.children){
+document.getElementById("children").value = aiData.children;
+}
+/* AUTO CALCULATE PAX */
+
+if(!aiData.pax && aiData.adults){
+
+let pax = parseInt(aiData.adults);
+
+if(aiData.children){
+pax += parseInt(aiData.children);
+}
+
+document.getElementById("pax").value = pax;
+
+}
 // Hotels
 if(aiData.hotels){
 document.getElementById("hotel1").value = aiData.hotels.join(", ");
