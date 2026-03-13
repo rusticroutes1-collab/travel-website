@@ -395,8 +395,17 @@ continue;
 /* CAPTURE INCLUSIONS */
 
 if(section === "inclusions"){
+
+if(clean === "") continue;
+
+if(lower.includes("exclusion")){
+section = "exclusions";
+continue;
+}
+
 inclusionsText += clean + "\n";
 continue;
+
 }
 
 /* CAPTURE EXCLUSIONS */
