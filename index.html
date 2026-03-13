@@ -384,16 +384,24 @@ section="exclusions";
 continue;
 }
 
+/* STOP collecting inclusions if a new section starts */
+
+if(section==="inclusions" && (lower.startsWith("hotel") || lower.startsWith("package cost"))){
+section="";
+}
+
 /* COLLECT INCLUSIONS */
 
 if(section==="inclusions"){
 inclusionsText += clean + "\n";
+continue;
 }
 
 /* COLLECT EXCLUSIONS */
 
 if(section==="exclusions"){
 exclusionsText += clean + "\n";
+continue;
 }
 /* ARRIVAL + DEPARTURE */
 
