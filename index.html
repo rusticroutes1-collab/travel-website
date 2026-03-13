@@ -343,24 +343,25 @@ continue;
 
 if(section==="hotel"){
 
-/* stop hotel section when next section starts */
-if(lower==="inclusions" || lower==="exclusions" || lower.includes("package cost")){
+/* stop reading hotels when next section starts */
+if(lower.startsWith("inclusions") || lower.startsWith("exclusions") || lower.includes("package cost")){
 section="";
 }else{
 
+/* only fill existing hotel inputs */
 let h = document.getElementById("hotel"+hotelIndex);
 
 if(h){
 
 h.value = clean;
-
 hotelIndex++;
 
-let nextHotel = document.getElementById("hotel"+hotelIndex);
+}else{
 
-if(!nextHotel){
+/* create new hotel field only if needed */
 addHotelOption();
-}
+document.getElementById("hotel"+hotelIndex).value = clean;
+hotelIndex++;
 
 }
 
