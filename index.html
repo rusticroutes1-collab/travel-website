@@ -364,7 +364,12 @@ document.getElementById("price1").value = aiData.packageCost;
 
 if(aiData.hotels){
 document.getElementById("hotel1").value =
-aiData.hotels.map(h => typeof h === "object" ? JSON.stringify(h) : h).join("\n");
+aiData.hotels.map(h => {
+if(typeof h === "object"){
+return h.name + " - " + h.room_type;
+}
+return h;
+}).join("\n");
 }
 
 if(aiData.inclusions){
