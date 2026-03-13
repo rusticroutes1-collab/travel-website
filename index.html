@@ -343,7 +343,8 @@ continue;
 
 if(section==="hotel"){
 
-if(lower.includes("package") || lower.includes("inclusion") || lower.includes("exclusion")){
+/* stop hotel section when next section starts */
+if(lower==="inclusions" || lower==="exclusions" || lower.includes("package cost")){
 section="";
 }else{
 
@@ -368,7 +369,6 @@ addHotelOption();
 continue;
 
 }
-
 /* INCLUSIONS */
 
 if(lower==="inclusions"){
