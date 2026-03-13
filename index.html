@@ -457,7 +457,7 @@ model:"gpt-4.1-mini",
 messages:[
 {
 role:"system",
-content:"Extract travel quotation details and return JSON with packageCost, hotels, inclusions, transport."
+content:"Extract travel quotation details from the text and return ONLY JSON in this format: {packageCost:'', hotels:[], inclusions:[], itinerary:[], transport:''}"
 },
 {
 role:"user",
@@ -472,9 +472,30 @@ let aiText = data.choices[0].message.content;
 
 let aiData = JSON.parse(aiText);
 
+// Hotels
+if(aiData.hotels){
 document.getElementById("hotel1").value = aiData.hotels.join(", ");
+}
 
+// Package cost
+if(aiData.packageCost){
 document.getElementById("price1").value = aiData.packageCost;
+}
+
+// Inclusions
+if(aiData.inclusions){
+document.getElementById("inclusions").value = aiData.inclusions.join("\n");
+}
+
+// Itinerary
+if(aiData.itinerary){
+document.getElementById("itinerary").value = aiData.itinerary.join("\n");
+}
+
+// Transport
+if(aiData.transport){
+document.getElementById("transport").value = aiData.transport;
+}
 
 
 }    
