@@ -337,10 +337,8 @@ continue;
 
 /* HOTEL DETECTION */
 
-if(clean.match(/night/i) && clean.match(/hotel|houseboat|resort|camp/i)){
-
+if(clean.match(/\b\d+\s*(night|nights|nts)\b/i)){
 cities.push(clean);
-
 }
 /* INCLUSIONS */
 
