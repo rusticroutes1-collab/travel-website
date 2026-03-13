@@ -332,8 +332,6 @@ let aiData=JSON.parse(aiText);
 
 /* APPLY AI DATA */
 
-/* APPLY AI DATA */
-
 if(aiData.destination){
 document.getElementById("destination").value = aiData.destination;
 }
@@ -362,40 +360,65 @@ if(aiData.packageCost){
 document.getElementById("price1").value = aiData.packageCost;
 }
 
+/* HOTELS – handles both text and object format */
+
 if(aiData.hotels){
 document.getElementById("hotel1").value =
 aiData.hotels.map(h => {
 if(typeof h === "object"){
-return h.name + " - " + h.room_type;
+return (h.name || "") + (h.room_type ? " - " + h.room_type : "");
 }
 return h;
 }).join("\n");
 }
 
+/* HOTEL OPTIONS */
+
+if(aiData.hotelOptions && aiData.hotelOptions.length > 1){
+
+for(let i=1;i<aiData.hotelOptions.length;i++){
+
+addHotelOption();
+
+let hotelField = document.getElementById("hotel"+(i+1));
+
+if(hotelField){
+
+hotelField.value = aiData.hotelOptions[i].map(h=>{
+if(typeof h==="object"){
+return (h.name||"")+(h.room_type?" - "+h.room_type:"");
+}
+return h;
+}).join(", ");
+
+}
+
+}
+
+}
+
+/* INCLUSIONS */
+
 if(aiData.inclusions){
 document.getElementById("inclusions").value = aiData.inclusions.join("\n");
 }
+
+/* ITINERARY */
 
 if(aiData.itinerary){
 document.getElementById("itinerary").value = aiData.itinerary.join("\n");
 }
 
+/* TRANSPORT */
+
 if(aiData.transport){
 document.getElementById("transport").value = aiData.transport;
 }
 
+/* TOURS */
+
 if(aiData.tours){
 document.getElementById("tours").value = aiData.tours.join("\n");
-}
-
-if(aiData.inclusions){
-document.getElementById("inclusions").value=aiData.inclusions.join("\n");
-}
-
-if(aiData.itinerary){
-document.getElementById("itinerary").value=aiData.itinerary.join("\n");
-}
-
 }
 
 /* GENERATE QUOTATION */
