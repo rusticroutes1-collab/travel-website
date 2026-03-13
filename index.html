@@ -260,8 +260,7 @@ if(clean==="") continue;
 
 /* DESTINATION */
 
-if(lower.startsWith("destination")){
-
+if(lower.includes("destination")){
 let val = clean.split(":")[1];
 
 if(val){
@@ -305,7 +304,12 @@ let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 if(dateMatch){
 document.getElementById("date").value = dateMatch[0];
 }
-
+if(lower.includes("arrival")){
+let val = clean.split(":")[1];
+if(val){
+document.getElementById("arrival").value = val.trim();
+}
+}
 /* PAX */
 
 if(lower.startsWith("pax")){
@@ -511,7 +515,18 @@ hotelField.value = aiData.hotelOptions[i].join(", ");
 if(aiData.packageCost){
 document.getElementById("price1").value = aiData.packageCost;
 }
-
+if(lower.includes("arrival")){
+let val = clean.split(":")[1];
+if(val){
+document.getElementById("arrival").value = val.trim();
+}
+}
+if(lower.includes("departure")){
+let val = clean.split(":")[1];
+if(val){
+document.getElementById("departure").value = val.trim();
+}
+}
 // Inclusions
 if(aiData.inclusions){
 document.getElementById("inclusions").value = aiData.inclusions.join("\n");
