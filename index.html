@@ -12,11 +12,19 @@ background:#f4f6f8;
 padding:40px;
 }
 
+.container{
+background:white;
+max-width:900px;
+margin:auto;
+padding:30px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
 .header{
 display:grid;
 grid-template-columns:200px auto;
 align-items:start;
-width:100%;
 margin-bottom:25px;
 }
 
@@ -27,15 +35,6 @@ height:60px;
 .header div{
 text-align:right;
 line-height:1.4;
-}
-
-.container{
-background:white;
-max-width:900px;
-margin:auto;
-padding:30px;
-border-radius:8px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
 }
 
 input, textarea{
@@ -68,17 +67,9 @@ margin:25px 0;
 
 @media print{
 
-button{
-display:none;
-}
-
-textarea,input{
-display:none;
-}
-
-#formArea{
-display:none;
-}
+button{display:none;}
+textarea,input{display:none;}
+#formArea{display:none;}
 
 .container{
 box-shadow:none;
@@ -201,14 +192,25 @@ Web : www.rusticroutes.net
 
 <script>
 
-let hotelCount=1;
+let hotelCount = 1;
 
-/* AUTO PARSE */
+/* AUTO CALCULATE PAX */
+
+document.getElementById("adults").addEventListener("input",calcPax);
+document.getElementById("children").addEventListener("input",calcPax);
+
+function calcPax(){
+let adults = parseInt(document.getElementById("adults").value)||0;
+let children = parseInt(document.getElementById("children").value)||0;
+document.getElementById("pax").value = adults + children;
+}
+
+/* SIMPLE PARSER */
 
 function smartParse(){
 
-let text=document.getElementById("roughQuote").value;
-let lines=text.split("\n");
+let text = document.getElementById("roughQuote").value;
+let lines = text.split("\n");
 
 let section="";
 let inclusionsText="";
@@ -216,42 +218,31 @@ let exclusionsText="";
 
 for(let i=0;i<lines.length;i++){
 
-let clean=lines[i].trim();
-let lower=clean.toLowerCase();
+let clean = lines[i].trim();
+let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
 /* DESTINATION */
 
 if(lower.includes("destination")){
-let val=clean.split(":")[1];
-if(val) document.getElementById("destination").value=val.trim();
+let val = clean.split(":")[1];
+if(val) document.getElementById("destination").value = val.trim();
 }
 
 /* DATE */
 
-let dateMatch=clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
+let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 
 if(dateMatch){
-document.getElementById("date").value=dateMatch[0];
-}
-
-/* PAX */
-
-if(lower.includes("pax")){
-let val=clean.match(/\d+/);
-if(val){
-document.getElementById("pax").value=val[0];
-}
+document.getElementById("date").value = dateMatch[0];
 }
 
 /* PACKAGE COST */
 
 if(lower.includes("package cost")){
-let price=clean.match(/[0-9,]+/);
-if(price){
-document.getElementById("price1").value="₹"+price[0];
-}
+let price = clean.match(/[0-9,]+/);
+if(price) document.getElementById("price1").value = "₹"+price[0];
 }
 
 /* INCLUSIONS */
@@ -269,19 +260,19 @@ continue;
 }
 
 if(section==="inclusions"){
-inclusionsText+=clean+"\n";
+inclusionsText += clean+"\n";
 continue;
 }
 
 if(section==="exclusions"){
-exclusionsText+=clean+"\n";
+exclusionsText += clean+"\n";
 continue;
 }
 
 }
 
-document.getElementById("inclusions").value=inclusionsText;
-document.getElementById("exclusions").value=exclusionsText;
+document.getElementById("inclusions").value = inclusionsText;
+document.getElementById("exclusions").value = exclusionsText;
 
 }
 
@@ -291,7 +282,7 @@ function addHotelOption(){
 
 hotelCount++;
 
-let html=`
+let html = `
 <hr>
 <h3>Option ${hotelCount}</h3>
 
@@ -302,7 +293,7 @@ let html=`
 <input id="price${hotelCount}">
 `;
 
-document.getElementById("hotelOptions").innerHTML+=html;
+document.getElementById("hotelOptions").innerHTML += html;
 
 }
 
@@ -310,9 +301,9 @@ document.getElementById("hotelOptions").innerHTML+=html;
 
 async function extractWithAI(){
 
-let text=document.getElementById("roughQuote").value;
+let text = document.getElementById("roughQuote").value;
 
-let response=await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
+let response = await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
@@ -324,67 +315,50 @@ messages:[
 })
 });
 
-let data=await response.json();
-let aiText=data.choices[0].message.content;
+let data = await response.json();
+let aiText = data.choices[0].message.content;
 
-aiText=aiText.replace(/```json/g,'').replace(/```/g,'');
-let aiData=JSON.parse(aiText);
+aiText = aiText.replace(/```json/g,'').replace(/```/g,'');
+let aiData = JSON.parse(aiText);
 
 /* APPLY AI DATA */
 
-if(aiData.destination){
-document.getElementById("destination").value = aiData.destination;
-}
+if(aiData.destination) document.getElementById("destination").value = aiData.destination;
+if(aiData.duration) document.getElementById("duration").value = aiData.duration;
+if(aiData.travelDate) document.getElementById("date").value = aiData.travelDate;
+if(aiData.arrival) document.getElementById("arrival").value = aiData.arrival;
+if(aiData.departure) document.getElementById("departure").value = aiData.departure;
+if(aiData.pax) document.getElementById("pax").value = aiData.pax;
+if(aiData.packageCost) document.getElementById("price1").value = aiData.packageCost;
 
-if(aiData.duration){
-document.getElementById("duration").value = aiData.duration;
-}
-
-if(aiData.travelDate){
-document.getElementById("date").value = aiData.travelDate;
-}
-
-if(aiData.arrival){
-document.getElementById("arrival").value = aiData.arrival;
-}
-
-if(aiData.departure){
-document.getElementById("departure").value = aiData.departure;
-}
-
-if(aiData.pax){
-document.getElementById("pax").value = aiData.pax;
-}
-
-if(aiData.packageCost){
-document.getElementById("price1").value = aiData.packageCost;
-}
-
-/* HOTELS – handles both text and object format */
+/* HOTELS (handles object format) */
 
 if(aiData.hotels){
+
 document.getElementById("hotel1").value =
-aiData.hotels.map(h => {
-if(typeof h === "object"){
-return (h.name || "") + (h.room_type ? " - " + h.room_type : "");
+aiData.hotels.map(h=>{
+if(typeof h==="object"){
+return (h.name||"")+(h.room_type?" - "+h.room_type:"");
 }
 return h;
 }).join("\n");
+
 }
 
 /* HOTEL OPTIONS */
 
-if(aiData.hotelOptions && aiData.hotelOptions.length > 1){
+if(aiData.hotelOptions && aiData.hotelOptions.length>1){
 
 for(let i=1;i<aiData.hotelOptions.length;i++){
 
 addHotelOption();
 
-let hotelField = document.getElementById("hotel"+(i+1));
+let hotelField=document.getElementById("hotel"+(i+1));
 
 if(hotelField){
 
-hotelField.value = aiData.hotelOptions[i].map(h=>{
+hotelField.value =
+aiData.hotelOptions[i].map(h=>{
 if(typeof h==="object"){
 return (h.name||"")+(h.room_type?" - "+h.room_type:"");
 }
@@ -397,28 +371,13 @@ return h;
 
 }
 
-/* INCLUSIONS */
+/* OTHER FIELDS */
 
-if(aiData.inclusions){
-document.getElementById("inclusions").value = aiData.inclusions.join("\n");
-}
+if(aiData.inclusions) document.getElementById("inclusions").value = aiData.inclusions.join("\n");
+if(aiData.itinerary) document.getElementById("itinerary").value = aiData.itinerary.join("\n");
+if(aiData.transport) document.getElementById("transport").value = aiData.transport;
+if(aiData.tours) document.getElementById("tours").value = aiData.tours.join("\n");
 
-/* ITINERARY */
-
-if(aiData.itinerary){
-document.getElementById("itinerary").value = aiData.itinerary.join("\n");
-}
-
-/* TRANSPORT */
-
-if(aiData.transport){
-document.getElementById("transport").value = aiData.transport;
-}
-
-/* TOURS */
-
-if(aiData.tours){
-document.getElementById("tours").value = aiData.tours.join("\n");
 }
 
 /* GENERATE QUOTATION */
@@ -431,6 +390,7 @@ let duration=document.getElementById("duration").value;
 let date=document.getElementById("date").value;
 let arrival=document.getElementById("arrival").value;
 let departure=document.getElementById("departure").value;
+
 let hotel=document.getElementById("hotel1").value;
 let price=document.getElementById("price1").value;
 
@@ -483,16 +443,19 @@ ${itinerary}
 <hr>
 
 <h3>Inclusions</h3>
+
 ${inclusions.split("\n").map(i=>"<li>"+i+"</li>").join("")}
 
 <hr>
 
 <h3>Exclusions</h3>
+
 ${exclusions}
 
 <hr>
 
 <h3>Terms & Conditions</h3>
+
 ${terms}
 
 `;
