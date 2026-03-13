@@ -198,25 +198,15 @@ Return ONLY valid JSON in this structure:
 "inclusions":[],
 "itinerary":[],
 "exclusions":[]
-}
-
-Rules:
-- destination should contain only city names
-- duration should include nights and days if available
-- hotels must include hotel name and room type
-- inclusions must be a list
-- itinerary must be a list
-- exclusions must be a list
-`
+}`
 },
 {
 role:"user",
 content:text
 }
 ]
-
 })
-});
+
 
 let data=await response.json();
 
