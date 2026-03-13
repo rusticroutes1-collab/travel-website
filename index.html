@@ -373,33 +373,27 @@ continue;
 /* INCLUSIONS */
 
 if(lower.startsWith("inclusions")){
-section="inclusions";
+section = "inclusions";
 continue;
 }
 
 /* EXCLUSIONS */
 
 if(lower.startsWith("exclusions")){
-section="exclusions";
+section = "exclusions";
 continue;
 }
 
-/* STOP collecting inclusions if a new section starts */
+/* CAPTURE INCLUSIONS */
 
-if(section==="inclusions" && (lower.startsWith("hotel") || lower.startsWith("package cost"))){
-section="";
-}
-
-/* COLLECT INCLUSIONS */
-
-if(section==="inclusions"){
+if(section === "inclusions"){
 inclusionsText += clean + "\n";
 continue;
 }
 
-/* COLLECT EXCLUSIONS */
+/* CAPTURE EXCLUSIONS */
 
-if(section==="exclusions"){
+if(section === "exclusions"){
 exclusionsText += clean + "\n";
 continue;
 }
