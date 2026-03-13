@@ -481,6 +481,7 @@ pax += parseInt(aiData.children);
 document.getElementById("pax").value = pax;
 
 }
+
 // Hotels
 if(aiData.hotels){
 
@@ -510,18 +511,7 @@ hotelField.value = aiData.hotelOptions[i].join(", ");
 if(aiData.packageCost){
 document.getElementById("price1").value = aiData.packageCost;
 }
-if(lower.includes("arrival")){
-let val = clean.split(":")[1];
-if(val){
-document.getElementById("arrival").value = val.trim();
-}
-}
-if(lower.includes("departure")){
-let val = clean.split(":")[1];
-if(val){
-document.getElementById("departure").value = val.trim();
-}
-}
+
 // Inclusions
 if(aiData.inclusions){
 document.getElementById("inclusions").value = aiData.inclusions.join("\n");
