@@ -323,15 +323,24 @@ return h;
 }
 
 if(aiData.inclusions){
+
+if(Array.isArray(aiData.inclusions)){
 document.getElementById("inclusions").value = aiData.inclusions.join("\n");
+}else{
+document.getElementById("inclusions").value = aiData.inclusions;
+}
+
 }
 
 if(aiData.itinerary){
+
+if(Array.isArray(aiData.itinerary)){
 document.getElementById("itinerary").value = aiData.itinerary.join("\n");
+}else{
+document.getElementById("itinerary").value = aiData.itinerary;
 }
 
 }
-
 /* GENERATE QUOTATION */
 
 function generateQuotation(){
