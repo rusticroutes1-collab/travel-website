@@ -484,8 +484,10 @@ document.getElementById("pax").value = pax;
 }
 // Hotels
 if(aiData.hotels){
-let hotelsFormatted = aiData.hotels.join("\n")
-.replace(/([a-z])([A-Z])/g, "$1\n$2");
+let hotelsFormatted = aiData.hotels
+.join("\n")
+.replace(/([a-z])([A-Z])/g, "$1\n$2")
+.replace(/(Bangkok|Pattaya|Phuket|Krabi|Singapore|Dubai)/g,"\n$1");
 
 document.getElementById("hotel1").value = hotelsFormatted;}
 if(aiData.hotelOptions && aiData.hotelOptions.length > 1){
