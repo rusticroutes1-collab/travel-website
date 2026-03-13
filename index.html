@@ -304,12 +304,7 @@ let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 if(dateMatch){
 document.getElementById("date").value = dateMatch[0];
 }
-if(lower.includes("arrival")){
-let val = clean.split(":")[1];
-if(val){
-document.getElementById("arrival").value = val.trim();
-}
-}
+
 /* PAX */
 
 if(lower.startsWith("pax")){
