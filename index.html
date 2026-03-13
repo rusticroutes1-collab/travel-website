@@ -194,43 +194,30 @@ Web : www.rusticroutes.net
 
 let hotelCount = 1;
 
-/* AUTO CALCULATE PAX */
-
-document.getElementById("adults").addEventListener("input",calcPax);
-document.getElementById("children").addEventListener("input",calcPax);
-
-function calcPax(){
-let adults = parseInt(document.getElementById("adults").value)||0;
-let children = parseInt(document.getElementById("children").value)||0;
-document.getElementById("pax").value = adults + children;
-}
-
-/* SIMPLE PARSER */
-
 function smartParse(){
 
-let text = document.getElementById("roughQuote").value;
-let lines = text.split("\n");
+let text=document.getElementById("roughQuote").value;
+let lines=text.split("\n");
 
-let section="";
 let inclusionsText="";
 let exclusionsText="";
+let section="";
 
 for(let i=0;i<lines.length;i++){
 
-let clean = lines[i].trim();
-let lower = clean.toLowerCase();
+let clean=lines[i].trim();
+let lower=clean.toLowerCase();
 
 if(clean==="") continue;
 
 if(lower.includes("destination")){
-let val = clean.split(":")[1];
-if(val) document.getElementById("destination").value = val.trim();
+let val=clean.split(":")[1];
+if(val) document.getElementById("destination").value=val.trim();
 }
 
 if(lower.includes("package cost")){
-let price = clean.match(/[0-9,]+/);
-if(price) document.getElementById("price1").value = "₹"+price[0];
+let price=clean.match(/[0-9,]+/);
+if(price) document.getElementById("price1").value="₹"+price[0];
 }
 
 if(lower.includes("inclusion")){
@@ -244,29 +231,27 @@ continue;
 }
 
 if(section==="inclusions"){
-inclusionsText += clean+"\n";
+inclusionsText+=clean+"\n";
 continue;
 }
 
 if(section==="exclusions"){
-exclusionsText += clean+"\n";
+exclusionsText+=clean+"\n";
 continue;
 }
 
 }
 
-document.getElementById("inclusions").value = inclusionsText;
-document.getElementById("exclusions").value = exclusionsText;
+document.getElementById("inclusions").value=inclusionsText;
+document.getElementById("exclusions").value=exclusionsText;
 
 }
-
-/* ADD HOTEL OPTION */
 
 function addHotelOption(){
 
 hotelCount++;
 
-let html = `
+let html=`
 <hr>
 <h3>Option ${hotelCount}</h3>
 
@@ -277,42 +262,42 @@ let html = `
 <input id="price${hotelCount}">
 `;
 
-document.getElementById("hotelOptions").innerHTML += html;
+document.getElementById("hotelOptions").innerHTML+=html;
 
 }
 
-/* AI EXTRACTION */
-
 async function extractWithAI(){
 
-let text = document.getElementById("roughQuote").value;
+let text=document.getElementById("roughQuote").value;
 
-let response = await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
+let response=await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 model:"gpt-4.1-mini",
 messages:[
-{role:"system",content:"Extract travel quotation data as JSON"},
+{role:"system",content:"Extract travel quotation details and return JSON"},
 {role:"user",content:text}
 ]
 })
 });
 
-let data = await response.json();
-let aiText = data.choices[0].message.content;
+let data=await response.json();
+let aiText=data.choices[0].message.content;
 
-aiText = aiText.replace(/```json/g,'').replace(/```/g,'');
-let aiData = JSON.parse(aiText);
+aiText=aiText.replace(/```json/g,'').replace(/```/g,'');
 
-/* APPLY AI DATA */
+let aiData=JSON.parse(aiText);
 
-if(aiData.destination) document.getElementById("destination").value = aiData.destination;
-if(aiData.packageCost) document.getElementById("price1").value = aiData.packageCost;
+if(aiData.destination)
+document.getElementById("destination").value=aiData.destination;
+
+if(aiData.packageCost)
+document.getElementById("price1").value=aiData.packageCost;
 
 if(aiData.hotels){
 
-document.getElementById("hotel1").value =
+document.getElementById("hotel1").value=
 aiData.hotels.map(h=>{
 if(typeof h==="object"){
 return (h.name||"")+(h.room_type?" - "+h.room_type:"");
@@ -324,26 +309,23 @@ return h;
 
 if(aiData.inclusions){
 
-if(Array.isArray(aiData.inclusions)){
-document.getElementById("inclusions").value = aiData.inclusions.join("\n");
-}
-else{
-document.getElementById("inclusions").value = aiData.inclusions;
-}
+if(Array.isArray(aiData.inclusions))
+document.getElementById("inclusions").value=aiData.inclusions.join("\n");
+else
+document.getElementById("inclusions").value=aiData.inclusions;
 
 }
 
 if(aiData.itinerary){
 
-if(Array.isArray(aiData.itinerary)){
-document.getElementById("itinerary").value = aiData.itinerary.join("\n");
-}
-else{
-document.getElementById("itinerary").value = aiData.itinerary;
+if(Array.isArray(aiData.itinerary))
+document.getElementById("itinerary").value=aiData.itinerary.join("\n");
+else
+document.getElementById("itinerary").value=aiData.itinerary;
+
 }
 
 }
-/* GENERATE QUOTATION */
 
 function generateQuotation(){
 
@@ -410,6 +392,5 @@ window.print();
 }
 
 </script>
-
 </body>
 </html>
