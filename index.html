@@ -484,8 +484,10 @@ document.getElementById("pax").value = pax;
 }
 // Hotels
 if(aiData.hotels){
-document.getElementById("hotel1").value = aiData.hotels.join("\n");
-}
+let hotelsFormatted = aiData.hotels.join("\n")
+.replace(/([a-z])([A-Z])/g, "$1\n$2");
+
+document.getElementById("hotel1").value = hotelsFormatted;}
 if(aiData.hotelOptions && aiData.hotelOptions.length > 1){
 
 for(let i=1;i<aiData.hotelOptions.length;i++){
