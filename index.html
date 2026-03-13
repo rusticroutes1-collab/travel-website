@@ -2,7 +2,10 @@
 <html>
 
 <head>
+
 <title>Rustic Routes Holidays - Package Quotation</title>
+
+<link rel="icon" href="logo.png">
 
 <style>
 
@@ -19,22 +22,6 @@ margin:auto;
 padding:30px;
 border-radius:8px;
 box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-
-.header{
-display:grid;
-grid-template-columns:200px auto;
-align-items:start;
-margin-bottom:25px;
-}
-
-.header img{
-height:60px;
-}
-
-.header div{
-text-align:right;
-line-height:1.4;
 }
 
 input, textarea{
@@ -65,28 +52,6 @@ hr{
 margin:25px 0;
 }
 
-@media print{
-
-button{display:none;}
-textarea,input{display:none;}
-#formArea{display:none;}
-
-.container{
-box-shadow:none;
-border:none;
-width:760px;
-margin:auto;
-}
-
-.output{
-border:none;
-background:white;
-margin:0;
-padding:0;
-}
-
-}
-
 </style>
 
 </head>
@@ -97,35 +62,12 @@ padding:0;
 
 <div id="formArea">
 
-<div class="header">
-
-<img src="logo.png">
-
-<div>
-<h2 style="margin:0;">Rustic Routes Holidays</h2>
-
-<p style="margin:3px 0;">
-Phone : +91 9811335942<br>
-Email : bookings@rusticroutes.net<br>
-Web : www.rusticroutes.net
-</p>
-
-</div>
-
-</div>
-
-<h3 style="text-align:center;">PACKAGE QUOTATION</h3>
+<h2 style="text-align:center">PACKAGE QUOTATION</h2>
 
 <label>Destination</label>
 <input id="destination">
 
-<label>Adults</label>
-<input type="number" id="adults">
-
-<label>Children</label>
-<input type="number" id="children">
-
-<label>Total Pax</label>
+<label>Pax</label>
 <input id="pax">
 
 <label>Duration</label>
@@ -139,9 +81,6 @@ Web : www.rusticroutes.net
 
 <label>Departure</label>
 <input id="departure">
-
-<label>Validity</label>
-<input id="validity">
 
 <h3>Paste Rough Quote</h3>
 
@@ -158,16 +97,6 @@ Web : www.rusticroutes.net
 <label>Package Cost</label>
 <input id="price1">
 
-<button onclick="addHotelOption()">+ Add Hotel Option</button>
-
-<div id="hotelOptions"></div>
-
-<h3>Transport</h3>
-<textarea id="transport"></textarea>
-
-<h3>Sightseeing</h3>
-<textarea id="tours"></textarea>
-
 <h3>Brief Itinerary</h3>
 <textarea id="itinerary"></textarea>
 
@@ -176,9 +105,6 @@ Web : www.rusticroutes.net
 
 <h3>Exclusions</h3>
 <textarea id="exclusions"></textarea>
-
-<h3>Terms & Conditions</h3>
-<textarea id="terms"></textarea>
 
 <button onclick="generateQuotation()">Generate Quotation</button>
 
@@ -192,18 +118,14 @@ Web : www.rusticroutes.net
 
 <script>
 
-alert("JS working");
-
-let hotelCount = 1;
-
 function smartParse(){
 
 let text=document.getElementById("roughQuote").value;
 let lines=text.split("\n");
 
+let section="";
 let inclusionsText="";
 let exclusionsText="";
-let section="";
 
 for(let i=0;i<lines.length;i++){
 
@@ -249,25 +171,6 @@ document.getElementById("exclusions").value=exclusionsText;
 
 }
 
-function addHotelOption(){
-
-hotelCount++;
-
-let html=`
-<hr>
-<h3>Option ${hotelCount}</h3>
-
-<label>Hotel Details</label>
-<input id="hotel${hotelCount}">
-
-<label>Package Cost</label>
-<input id="price${hotelCount}">
-`;
-
-document.getElementById("hotelOptions").innerHTML+=html;
-
-}
-
 async function extractWithAI(){
 
 let text=document.getElementById("roughQuote").value;
@@ -285,45 +188,78 @@ messages:[
 });
 
 let data=await response.json();
+
 let aiText=data.choices[0].message.content;
 
 aiText=aiText.replace(/```json/g,'').replace(/```/g,'');
 
 let aiData=JSON.parse(aiText);
 
-if(aiData.destination)
-document.getElementById("destination").value=aiData.destination;
+/* Destination */
 
-if(aiData.packageCost)
+if(aiData.destination){
+document.getElementById("destination").value=aiData.destination.replace(/[0-9]+N/g,"").trim();
+}
+
+/* Package Cost */
+
+if(aiData.packageCost){
 document.getElementById("price1").value=aiData.packageCost;
+}
+
+/* Hotels */
 
 if(aiData.hotels){
 
-document.getElementById("hotel1").value=
-aiData.hotels.map(h=>{
+let hotelLines=aiData.hotels.map(h=>{
+
 if(typeof h==="object"){
-return (h.name||"")+(h.room_type?" - "+h.room_type:"");
+return (h.name||"")+" - "+(h.room_type||"");
 }
+
 return h;
-}).join("\n");
+
+});
+
+document.getElementById("hotel1").value=hotelLines.join("\n\n");
 
 }
+
+/* Inclusions */
 
 if(aiData.inclusions){
 
-if(Array.isArray(aiData.inclusions))
-document.getElementById("inclusions").value=aiData.inclusions.join("\n");
-else
+if(Array.isArray(aiData.inclusions)){
+
+let cleanList=aiData.inclusions.map(i=>{
+
+if(typeof i==="object"){
+return JSON.stringify(i);
+}
+
+return i;
+
+});
+
+document.getElementById("inclusions").value=cleanList.join("\n");
+
+}
+else{
 document.getElementById("inclusions").value=aiData.inclusions;
+}
 
 }
 
+/* Itinerary */
+
 if(aiData.itinerary){
 
-if(Array.isArray(aiData.itinerary))
+if(Array.isArray(aiData.itinerary)){
 document.getElementById("itinerary").value=aiData.itinerary.join("\n");
-else
+}
+else{
 document.getElementById("itinerary").value=aiData.itinerary;
+}
 
 }
 
@@ -394,5 +330,6 @@ window.print();
 }
 
 </script>
+
 </body>
 </html>
