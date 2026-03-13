@@ -223,36 +223,20 @@ let lower = clean.toLowerCase();
 
 if(clean==="") continue;
 
-/* DESTINATION */
-
 if(lower.includes("destination")){
 let val = clean.split(":")[1];
 if(val) document.getElementById("destination").value = val.trim();
 }
-
-/* DATE */
-
-let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
-
-if(dateMatch){
-document.getElementById("date").value = dateMatch[0];
-}
-
-/* PACKAGE COST */
 
 if(lower.includes("package cost")){
 let price = clean.match(/[0-9,]+/);
 if(price) document.getElementById("price1").value = "₹"+price[0];
 }
 
-/* INCLUSIONS */
-
 if(lower.includes("inclusion")){
 section="inclusions";
 continue;
 }
-
-/* EXCLUSIONS */
 
 if(lower.includes("exclusion")){
 section="exclusions";
@@ -324,14 +308,7 @@ let aiData = JSON.parse(aiText);
 /* APPLY AI DATA */
 
 if(aiData.destination) document.getElementById("destination").value = aiData.destination;
-if(aiData.duration) document.getElementById("duration").value = aiData.duration;
-if(aiData.travelDate) document.getElementById("date").value = aiData.travelDate;
-if(aiData.arrival) document.getElementById("arrival").value = aiData.arrival;
-if(aiData.departure) document.getElementById("departure").value = aiData.departure;
-if(aiData.pax) document.getElementById("pax").value = aiData.pax;
 if(aiData.packageCost) document.getElementById("price1").value = aiData.packageCost;
-
-/* HOTELS (handles object format) */
 
 if(aiData.hotels){
 
@@ -345,38 +322,13 @@ return h;
 
 }
 
-/* HOTEL OPTIONS */
-
-if(aiData.hotelOptions && aiData.hotelOptions.length>1){
-
-for(let i=1;i<aiData.hotelOptions.length;i++){
-
-addHotelOption();
-
-let hotelField=document.getElementById("hotel"+(i+1));
-
-if(hotelField){
-
-hotelField.value =
-aiData.hotelOptions[i].map(h=>{
-if(typeof h==="object"){
-return (h.name||"")+(h.room_type?" - "+h.room_type:"");
-}
-return h;
-}).join(", ");
-
+if(aiData.inclusions){
+document.getElementById("inclusions").value = aiData.inclusions.join("\n");
 }
 
+if(aiData.itinerary){
+document.getElementById("itinerary").value = aiData.itinerary.join("\n");
 }
-
-}
-
-/* OTHER FIELDS */
-
-if(aiData.inclusions) document.getElementById("inclusions").value = aiData.inclusions.join("\n");
-if(aiData.itinerary) document.getElementById("itinerary").value = aiData.itinerary.join("\n");
-if(aiData.transport) document.getElementById("transport").value = aiData.transport;
-if(aiData.tours) document.getElementById("tours").value = aiData.tours.join("\n");
 
 }
 
@@ -397,10 +349,6 @@ let price=document.getElementById("price1").value;
 let itinerary=document.getElementById("itinerary").value;
 let inclusions=document.getElementById("inclusions").value;
 let exclusions=document.getElementById("exclusions").value;
-let transport=document.getElementById("transport").value;
-let tours=document.getElementById("tours").value;
-let validity=document.getElementById("validity").value;
-let terms=document.getElementById("terms").value;
 
 document.getElementById("formArea").style.display="none";
 document.getElementById("output").style.display="block";
@@ -415,7 +363,6 @@ document.getElementById("output").innerHTML=`
 <b>Travel Date :</b> ${date}<br>
 <b>Arrival :</b> ${arrival}<br>
 <b>Departure :</b> ${departure}<br>
-<b>Validity :</b> ${validity}<br>
 
 <hr>
 
@@ -427,17 +374,8 @@ ${hotel}
 
 <hr>
 
-<h3>Transport</h3>
-${transport}
-
-<hr>
-
-<h3>Sightseeing</h3>
-${tours}
-
-<hr>
-
 <h3>Brief Itinerary</h3>
+
 ${itinerary}
 
 <hr>
@@ -451,12 +389,6 @@ ${inclusions.split("\n").map(i=>"<li>"+i+"</li>").join("")}
 <h3>Exclusions</h3>
 
 ${exclusions}
-
-<hr>
-
-<h3>Terms & Conditions</h3>
-
-${terms}
 
 `;
 
