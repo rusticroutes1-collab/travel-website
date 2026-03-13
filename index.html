@@ -6,39 +6,6 @@
 
 <style>
 
-.header{
-display:grid;
-grid-template-columns:200px auto;
-align-items:start;
-width:100%;
-margin-bottom:25px;
-}
-
-.header img{
-height:60px;
-}
-
-.header div{
-text-align:right;
-line-height:1.4;
-}
-
-body{
-font-family:Arial;
-background:#f4f6f8;
-padding:40px;
-}
-
-.container{
-background:white;
-max-width:800px;
-margin:auto;
-padding:30px;
-border-radius:8px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-<style>
-
 body{
 font-family:Arial;
 background:#f4f6f8;
@@ -64,7 +31,7 @@ line-height:1.4;
 
 .container{
 background:white;
-max-width:800px;
+max-width:900px;
 margin:auto;
 padding:30px;
 border-radius:8px;
@@ -95,37 +62,11 @@ border:1px solid #ccc;
 background:#fafafa;
 }
 
-
-
-h3{
-margin-top:25px;
-}
-
 hr{
 margin:25px 0;
 }
 
-/* PRINT SETTINGS */
-
 @media print{
-.header{
-padding-right:15px;
-}
-@page{
-size:A4;
-margin:20mm;
-}
-body{
-background:white;
-padding:0;
-}
-
-.container{
-box-shadow:none;
-border:none;
-width:760px;
-margin:auto;
-}
 
 button{
 display:none;
@@ -139,25 +80,32 @@ display:none;
 display:none;
 }
 
+.container{
+box-shadow:none;
+border:none;
+width:760px;
+margin:auto;
+}
+
 .output{
 border:none;
 background:white;
 margin:0;
 padding:0;
 }
-.header{
-padding-right:20px;
+
 }
 
 </style>
-
 
 </head>
 
 <body>
 
 <div class="container">
+
 <div id="formArea">
+
 <div class="header">
 
 <img src="logo.png">
@@ -180,8 +128,14 @@ Web : www.rusticroutes.net
 <label>Destination</label>
 <input id="destination">
 
-<label>Pax Details</label>
-<input type="number" id="pax" placeholder="Enter number of passengers">
+<label>Adults</label>
+<input type="number" id="adults">
+
+<label>Children</label>
+<input type="number" id="children">
+
+<label>Total Pax</label>
+<input id="pax">
 
 <label>Duration</label>
 <input id="duration">
@@ -195,25 +149,33 @@ Web : www.rusticroutes.net
 <label>Departure</label>
 <input id="departure">
 
-<h3>Option 1</h3>
+<label>Validity</label>
+<input id="validity">
+
 <h3>Paste Rough Quote</h3>
 
-<textarea id="roughQuote" placeholder="Paste rough quotation here" style="width:100%;height:120px;"></textarea>
+<textarea id="roughQuote" style="height:120px;"></textarea>
 
-<button type="button" onclick="smartParse()">Auto Fill Fields</button>
+<button onclick="smartParse()">Auto Fill Fields</button>
 <button onclick="extractWithAI()">AI Extract Quote</button>
+
 <hr>
+
 <label>Hotel Details</label>
-<input type="text" id="hotel1">
+<input id="hotel1">
 
 <label>Package Cost</label>
-<input type="text" id="price1">
+<input id="price1">
 
-<button type="button" onclick="addHotelOption()">+ Add Hotel Option</button>
+<button onclick="addHotelOption()">+ Add Hotel Option</button>
 
 <div id="hotelOptions"></div>
 
+<h3>Transport</h3>
+<textarea id="transport"></textarea>
 
+<h3>Sightseeing</h3>
+<textarea id="tours"></textarea>
 
 <h3>Brief Itinerary</h3>
 <textarea id="itinerary"></textarea>
@@ -224,6 +186,9 @@ Web : www.rusticroutes.net
 <h3>Exclusions</h3>
 <textarea id="exclusions"></textarea>
 
+<h3>Terms & Conditions</h3>
+<textarea id="terms"></textarea>
+
 <button onclick="generateQuotation()">Generate Quotation</button>
 
 </div>
@@ -231,388 +196,243 @@ Web : www.rusticroutes.net
 <div class="output" id="output" style="display:none;"></div>
 
 <button onclick="downloadPDF()">Download PDF</button>
-</div>
 
+</div>
 
 <script>
 
-let hotelCount = 1;
+let hotelCount=1;
+
+/* AUTO PARSE */
 
 function smartParse(){
 
-
-
-let text = document.getElementById("roughQuote").value;
-let lines = text.split("\n");
+let text=document.getElementById("roughQuote").value;
+let lines=text.split("\n");
 
 let section="";
 let inclusionsText="";
 let exclusionsText="";
-let cities=[];
-let hotels=[];
 
 for(let i=0;i<lines.length;i++){
 
-let clean = lines[i].trim();
-let lower = clean.toLowerCase();
+let clean=lines[i].trim();
+let lower=clean.toLowerCase();
 
 if(clean==="") continue;
 
 /* DESTINATION */
 
 if(lower.includes("destination")){
-let val = clean.split(":")[1];
-
-if(val){
-
-document.getElementById("destination").value = val.trim();
-
-let parts = val.split("+");
-let totalNights=0;
-
-for(let j=0;j<parts.length;j++){
-
-let nightMatch = parts[j].match(/\d+/);
-
-if(nightMatch){
-totalNights += parseInt(nightMatch[0]);
-}
-
-let city = parts[j].replace(/[0-9nN]/g,"").trim();
-
-if(city){
-cities.push(city);
-}
-
-}
-
-let days = totalNights + 1;
-
-document.getElementById("duration").value =
-totalNights + " Nights / " + days + " Days";
-
-}
-
-continue;
-
+let val=clean.split(":")[1];
+if(val) document.getElementById("destination").value=val.trim();
 }
 
 /* DATE */
 
-let dateMatch = clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
+let dateMatch=clean.match(/\d{1,2}\s+[A-Za-z]+\s+\d{4}/);
 
 if(dateMatch){
-document.getElementById("date").value = dateMatch[0];
+document.getElementById("date").value=dateMatch[0];
 }
 
 /* PAX */
 
-if(lower.startsWith("pax")){
-
-let val = clean.split(":")[1];
-
+if(lower.includes("pax")){
+let val=clean.match(/\d+/);
 if(val){
-document.getElementById("pax").value = val.trim();
+document.getElementById("pax").value=val[0];
 }
-
-continue;
-
 }
 
 /* PACKAGE COST */
 
 if(lower.includes("package cost")){
-
-let price = clean.match(/[0-9,]+/);
-
+let price=clean.match(/[0-9,]+/);
 if(price){
-document.getElementById("price1").value = "₹"+price[0];
+document.getElementById("price1").value="₹"+price[0];
+}
 }
 
-continue;
-
-}
-
-
-
-/* HOTEL DETECTION */
-
-if(clean.match(/\b\d+\s*(night|nights|nts)\b/i)){
-hotels.push(clean);
-}
 /* INCLUSIONS */
 
 if(lower.includes("inclusion")){
-section = "inclusions";
+section="inclusions";
 continue;
 }
 
 /* EXCLUSIONS */
 
 if(lower.includes("exclusion")){
-section = "exclusions";
+section="exclusions";
 continue;
 }
 
-/* CAPTURE INCLUSIONS */
-
-if(section === "inclusions"){
-
-if(clean === "") continue;
-
-if(lower.includes("exclusion")){
-section = "exclusions";
+if(section==="inclusions"){
+inclusionsText+=clean+"\n";
 continue;
 }
 
-inclusionsText += clean + "\n";
-continue;
-
-}
-
-/* CAPTURE EXCLUSIONS */
-
-if(section === "exclusions"){
-exclusionsText += clean + "\n";
+if(section==="exclusions"){
+exclusionsText+=clean+"\n";
 continue;
 }
-}   // closes the for loop
-
-
-/* ARRIVAL + DEPARTURE */
-
-if(cities.length > 0){
-
-document.getElementById("arrival").value = cities[0];
-document.getElementById("departure").value = cities[cities.length-1];
 
 }
 
-
-/* APPLY TEXT */
-
-document.getElementById("inclusions").value = inclusionsText;
-document.getElementById("exclusions").value = exclusionsText;
+document.getElementById("inclusions").value=inclusionsText;
+document.getElementById("exclusions").value=exclusionsText;
 
 }
+
+/* ADD HOTEL OPTION */
+
 function addHotelOption(){
 
 hotelCount++;
 
-let html = `
-<div id="option${hotelCount}">
+let html=`
 <hr>
-
 <h3>Option ${hotelCount}</h3>
 
 <label>Hotel Details</label>
-<input type="text" id="hotel${hotelCount}">
+<input id="hotel${hotelCount}">
 
 <label>Package Cost</label>
-<input type="text" id="price${hotelCount}">
-
-</div>
+<input id="price${hotelCount}">
 `;
 
-document.getElementById("hotelOptions").innerHTML += html;
+document.getElementById("hotelOptions").innerHTML+=html;
 
 }
+
+/* AI EXTRACTION */
 
 async function extractWithAI(){
 
+let text=document.getElementById("roughQuote").value;
 
-
-let text = document.getElementById("roughQuote").value;
-
-let response = await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
+let response=await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
 method:"POST",
-headers:{
-"Content-Type":"application/json",
-
-},
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 model:"gpt-4.1-mini",
 messages:[
-{
-role:"system",
-content:"Extract travel quotation details from the text and return ONLY JSON in this format: {destination:'', duration:'', travelDate:'', arrival:'', departure:'', packageCost:'', hotels:[], hotelOptions:[], inclusions:[], itinerary:[], transport:'', pax:'', adults:'', children:''}"
-},
-{
-role:"user",
-content:text
-}
+{role:"system",content:"Extract travel quotation data as JSON"},
+{role:"user",content:text}
 ]
 })
 });
-let data = await response.json();
 
-let aiText = data.choices[0].message.content;
+let data=await response.json();
+let aiText=data.choices[0].message.content;
 
-aiText = aiText.replace(/```json/g,'').replace(/```/g,'');
-let aiData = JSON.parse(aiText);
+aiText=aiText.replace(/```json/g,'').replace(/```/g,'');
+let aiData=JSON.parse(aiText);
 
-/* PAX */
+/* APPLY AI DATA */
 
-if(aiData.pax && document.getElementById("pax")){
-document.getElementById("pax").value = parseInt(aiData.pax);
-}
+if(aiData.destination) document.getElementById("destination").value=aiData.destination;
 
-/* ADULTS */
+if(aiData.packageCost) document.getElementById("price1").value=aiData.packageCost;
 
-if(aiData.adults && document.getElementById("adults")){
-document.getElementById("adults").value = parseInt(aiData.adults);
-}
-
-/* CHILDREN */
-
-if(aiData.children && document.getElementById("children")){
-document.getElementById("children").value = parseInt(aiData.children);
-}
-/* AUTO CALCULATE PAX */
-
-if(!aiData.pax && aiData.adults){
-
-let pax = parseInt(aiData.adults);
-
-if(aiData.children){
-pax += parseInt(aiData.children);
-}
-
-document.getElementById("pax").value = pax;
-
-}
-
-// Hotels
 if(aiData.hotels){
-
-let hotelsFormatted = aiData.hotels
-.join("\n")
-.replace(/([a-z])([A-Z])/g,"$1\n$2")
-.replace(/(Bangkok|Pattaya|Phuket|Krabi|Singapore|Dubai)/g,"\n$1")
-.replace(/\n+/g,"\n")
-.trim();
-
-document.getElementById("hotel1").value = hotelsFormatted;
-
+document.getElementById("hotel1").value=aiData.hotels.join("\n");
 }
 
-addHotelOption();
-
-let hotelField = document.getElementById("hotel"+(i+1));
-
-if(hotelField){
-hotelField.value = aiData.hotelOptions[i].join(", ");
-}
-
-}
-
-
-
-
-// Package cost
-if(aiData.packageCost){
-document.getElementById("price1").value = aiData.packageCost;
-}
-
-// Inclusions
 if(aiData.inclusions){
-document.getElementById("inclusions").value = aiData.inclusions.join("\n");
+document.getElementById("inclusions").value=aiData.inclusions.join("\n");
 }
 
-// Itinerary
 if(aiData.itinerary){
-document.getElementById("itinerary").value = aiData.itinerary.join("\n");
+document.getElementById("itinerary").value=aiData.itinerary.join("\n");
 }
 
-// Transport
-if(aiData.transport){
-document.getElementById("transport").value = aiData.transport;
 }
 
+/* GENERATE QUOTATION */
 
-}    
 function generateQuotation(){
 
-let destination=document.getElementById("destination").value
-let pax = document.getElementById("pax").value;
+let destination=document.getElementById("destination").value;
+let pax=document.getElementById("pax").value;
+let duration=document.getElementById("duration").value;
+let date=document.getElementById("date").value;
+let arrival=document.getElementById("arrival").value;
+let departure=document.getElementById("departure").value;
+let hotel=document.getElementById("hotel1").value;
+let price=document.getElementById("price1").value;
 
-let paxText = pax + " Adult";
-if(pax > 1){
-    paxText = pax + " Adults";
-}
-let duration=document.getElementById("duration").value
-let date=document.getElementById("date").value
-let arrival=document.getElementById("arrival").value
-let departure=document.getElementById("departure").value
-
-let hotel1 = document.getElementById("hotel1").value;
-let price1 = document.getElementById("price1").value;
-
-let hotelHTML = hotel1;
-
-for(let i=2;i<=hotelCount;i++){
-
-let h=document.getElementById("hotel"+i);
-
-if(h && h.value){
-hotelHTML += "<br>"+h.value
-}
-
-}
-
-let itinerary=document.getElementById("itinerary").value
-let inclusions=document.getElementById("inclusions").value
-let exclusions=document.getElementById("exclusions").value
+let itinerary=document.getElementById("itinerary").value;
+let inclusions=document.getElementById("inclusions").value;
+let exclusions=document.getElementById("exclusions").value;
+let transport=document.getElementById("transport").value;
+let tours=document.getElementById("tours").value;
+let validity=document.getElementById("validity").value;
+let terms=document.getElementById("terms").value;
 
 document.getElementById("formArea").style.display="none";
 document.getElementById("output").style.display="block";
 
-document.getElementById("output").innerHTML = `
+document.getElementById("output").innerHTML=`
 
 <h2 style="text-align:center">PACKAGE QUOTATION</h2>
 
 <b>Destination :</b> ${destination}<br>
-<b>Pax :</b> ${paxText}<br>
+<b>Pax :</b> ${pax}<br>
 <b>Duration :</b> ${duration}<br>
 <b>Travel Date :</b> ${date}<br>
 <b>Arrival :</b> ${arrival}<br>
 <b>Departure :</b> ${departure}<br>
+<b>Validity :</b> ${validity}<br>
 
 <hr>
 
 <h3>Hotel</h3>
 
-<b>Package Cost :</b> ${price1}<br><br>
+<b>Package Cost :</b> ${price}<br><br>
 
-${hotelHTML}
+${hotel}
+
+<hr>
+
+<h3>Transport</h3>
+${transport}
+
+<hr>
+
+<h3>Sightseeing</h3>
+${tours}
 
 <hr>
 
 <h3>Brief Itinerary</h3>
-
 ${itinerary}
 
 <hr>
 
 <h3>Inclusions</h3>
+${inclusions.split("\n").map(i=>"<li>"+i+"</li>").join("")}
 
-${inclusions.split("\n").map(i => "<li>"+i+"</li>").join("")}
 <hr>
 
 <h3>Exclusions</h3>
-
 ${exclusions}
+
+<hr>
+
+<h3>Terms & Conditions</h3>
+${terms}
 
 `;
 
 }
+
 function downloadPDF(){
 window.print();
 }
 
 </script>
+
 </body>
-
 </html>
-
-
