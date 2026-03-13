@@ -373,11 +373,9 @@ continue;
 }
 /* HOTEL DETECTION */
 
-if(clean.match(/night|nights|nts/i) && clean.match(/hotel|houseboat|resort|camp/i)){
+if(clean.match(/night/i) && clean.match(/hotel|houseboat|resort|camp/i)){
 
 cities.push(clean);
-
-continue;
 
 }
 /* INCLUSIONS */
