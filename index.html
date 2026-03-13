@@ -332,12 +332,55 @@ let aiData=JSON.parse(aiText);
 
 /* APPLY AI DATA */
 
-if(aiData.destination) document.getElementById("destination").value=aiData.destination;
+/* APPLY AI DATA */
 
-if(aiData.packageCost) document.getElementById("price1").value=aiData.packageCost;
+if(aiData.destination){
+document.getElementById("destination").value = aiData.destination;
+}
+
+if(aiData.duration){
+document.getElementById("duration").value = aiData.duration;
+}
+
+if(aiData.travelDate){
+document.getElementById("date").value = aiData.travelDate;
+}
+
+if(aiData.arrival){
+document.getElementById("arrival").value = aiData.arrival;
+}
+
+if(aiData.departure){
+document.getElementById("departure").value = aiData.departure;
+}
+
+if(aiData.pax){
+document.getElementById("pax").value = aiData.pax;
+}
+
+if(aiData.packageCost){
+document.getElementById("price1").value = aiData.packageCost;
+}
 
 if(aiData.hotels){
-document.getElementById("hotel1").value=aiData.hotels.join("\n");
+document.getElementById("hotel1").value =
+aiData.hotels.map(h => typeof h === "object" ? JSON.stringify(h) : h).join("\n");
+}
+
+if(aiData.inclusions){
+document.getElementById("inclusions").value = aiData.inclusions.join("\n");
+}
+
+if(aiData.itinerary){
+document.getElementById("itinerary").value = aiData.itinerary.join("\n");
+}
+
+if(aiData.transport){
+document.getElementById("transport").value = aiData.transport;
+}
+
+if(aiData.tours){
+document.getElementById("tours").value = aiData.tours.join("\n");
 }
 
 if(aiData.inclusions){
