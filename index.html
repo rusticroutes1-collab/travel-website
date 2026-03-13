@@ -446,7 +446,7 @@ async function extractWithAI(){
 
 let text = document.getElementById("roughQuote").value;
 
-fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
+let response = await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
