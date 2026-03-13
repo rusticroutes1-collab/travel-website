@@ -372,14 +372,14 @@ continue;
 }
 /* INCLUSIONS */
 
-if(lower.includes("inclusions")){
+if(lower.includes("inclusion")){
 section = "inclusions";
 continue;
 }
 
 /* EXCLUSIONS */
 
-if(lower.startsWith("exclusions")){
+if(lower.includes("exclusion")){
 section = "exclusions";
 continue;
 }
@@ -397,7 +397,6 @@ if(section === "exclusions"){
 exclusionsText += clean + "\n";
 continue;
 }
-
 }   // closes the for loop
 
 
