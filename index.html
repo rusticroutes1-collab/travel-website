@@ -470,9 +470,11 @@ let data = await response.json();
 
 let aiText = data.choices[0].message.content;
 
-console.log(aiText);
+let aiData = JSON.parse(aiText);
 
-document.getElementById("hotel1").value = aiText;
+document.getElementById("hotel1").value = aiData.hotels.join(", ");
+
+document.getElementById("price1").value = aiData.packageCost;
 
 
 }    
