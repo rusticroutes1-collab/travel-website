@@ -181,9 +181,40 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 model:"gpt-4.1-mini",
 messages:[
-{role:"system",content:"Extract travel quotation details and return JSON"},
-{role:"user",content:text}
+{
+role:"system",
+content:`Extract travel quotation details from the text.
+
+Return ONLY valid JSON in this structure:
+
+{
+"destination":"",
+"duration":"",
+"travelDate":"",
+"arrival":"",
+"departure":"",
+"packageCost":"",
+"hotels":[],
+"inclusions":[],
+"itinerary":[],
+"exclusions":[]
+}
+
+Rules:
+- destination should contain only city names
+- duration should include nights and days if available
+- hotels must include hotel name and room type
+- inclusions must be a list
+- itinerary must be a list
+- exclusions must be a list
+`
+},
+{
+role:"user",
+content:text
+}
 ]
+
 })
 });
 
