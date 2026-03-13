@@ -467,8 +467,12 @@ content:text
 })
 });
 let data = await response.json();
-console.log(data);
-alert("AI response received - check console");
+
+let aiText = data.choices[0].message.content;
+
+console.log(aiText);
+
+document.getElementById("hotel1").value = aiText;
 
 
 }    
