@@ -99,7 +99,21 @@ if(result.duration) document.getElementById("duration").value=result.duration;
 if(result.travel_date) document.getElementById("date").value=result.travel_date;
 if(result.arrival) document.getElementById("arrival").value=result.arrival;
 if(result.departure) document.getElementById("departure").value=result.departure;
-if(result.hotel) document.getElementById("hotel1").value=result.hotel;
+if(result.hotels && result.hotels.length){
+
+for(let i=0;i<result.hotels.length;i++){
+
+let hotel = result.hotels[i];
+
+let field = document.getElementById("hotel"+(i+1));
+
+if(field){
+field.value = hotel.name + " - " + (hotel.room || "");
+}
+
+}
+
+}
 if(result.price) document.getElementById("price1").value=result.price;
 
 if(result.inclusions){
