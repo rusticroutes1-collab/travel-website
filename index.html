@@ -74,14 +74,14 @@ response_format:{type:"json_object"},
 messages:[
 {
 role:"system",
-content:`Extract travel quotation details from the text and return JSON.
+content:`Extract travel quotation details from the provided text.
 
 Rules:
-- Extract package price exactly as written in the quotation.
+- Extract the package price exactly as written.
 - Do NOT calculate or multiply the price.
-- Return only the numeric price.
+- Return only the numeric value for price.
 
-Return JSON with:
+Return JSON with the following fields:
 duration,
 travel_date,
 arrival,
@@ -96,7 +96,6 @@ role:"user",
 content:text
 }
 ]
-})
 const data = await response.json();
 console.log(data);
 let result = {};
