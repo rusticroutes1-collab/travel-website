@@ -203,12 +203,11 @@ Return ONLY valid JSON in this structure:
 {
 role:"user",
 content:text
-}
 ]
 })
+});
 
-
-let data=await response.json();
+let data = await response.json();
 
 let aiText=data.choices[0].message.content;
 
