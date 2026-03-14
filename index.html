@@ -42,7 +42,7 @@ async function extractWithAI() {
     aiButton.disabled = true;
 
     try {
-        let response = await fetch("https://api.openai.com", {
+                let response = await fetch("https://api.openai.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -50,11 +50,11 @@ async function extractWithAI() {
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
-                // We force the AI to return ONLY JSON
                 response_format: { type: "json_object" },
                 messages:
             })
         });
+
 
         let data = await response.json();
         // Parse the string response into a real JavaScript object
