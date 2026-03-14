@@ -74,8 +74,32 @@ response_format:{type:"json_object"},
 messages:[
 {
 role:"system",
-content:"Extract travel quotation details and return JSON with duration, travel_date, arrival, departure, hotel, price, inclusions, exclusions"
+{
+role:"system",
+content:`Extract travel quotation details and return JSON.
+
+IMPORTANT RULES:
+1. Package price must be extracted EXACTLY as written in the quotation.
+2. Do NOT calculate, multiply, convert, or modify the price.
+3. Do NOT change currency or numbers.
+4. If price is written like "Rs 54,500/- net", return 54500.
+5. Only extract the price mentioned in the quotation.
+
+Return JSON with fields:
+duration,
+travel_date,
+arrival,
+departure,
+hotel,
+price,
+inclusions,
+exclusions`
 },
+{
+role:"user",
+content:text
+}
+]},
 {
 role:"user",
 content:text
