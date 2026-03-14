@@ -85,7 +85,7 @@ content:text
 });
 
 const data = await response.json();
-
+console.log(data);
 const result = JSON.parse(data.choices[0].message.content);
 
 if(result.duration) document.getElementById("duration").value=result.duration;
