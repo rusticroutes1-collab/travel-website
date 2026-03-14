@@ -25,11 +25,23 @@ button{padding:10px 20px;background:#2c7be5;color:white;border:none;cursor:point
 
 <h3>Travel Details</h3>
 
+<label>Destination</label>
+<input id="destination">
+
 <label>Duration</label>
 <input id="duration">
 
 <label>Travel Date</label>
 <input id="date">
+
+<label>Total Pax</label>
+<input id="pax">
+
+<label>Adults</label>
+<input id="adults">
+
+<label>Children</label>
+<input id="children">
 
 <label>Arrival</label>
 <input id="arrival">
@@ -38,7 +50,6 @@ button{padding:10px 20px;background:#2c7be5;color:white;border:none;cursor:point
 <input id="departure">
 
 <h3>Hotel</h3>
-
 <label>Hotel Name</label>
 <input id="hotel1">
 
@@ -51,7 +62,10 @@ button{padding:10px 20px;background:#2c7be5;color:white;border:none;cursor:point
 <h3>Exclusions</h3>
 <textarea id="exclusions"></textarea>
 
+<h3>Suggested Itinerary</h3>
+<textarea id="itinerary"></textarea>
 
+<button onclick="window.print()">Print / Save PDF</button>
 <script>
 
 async function runAI(){
@@ -112,9 +126,14 @@ console.error("AI response invalid:", data);
 alert("AI response error. Check Worker.");
 return;
 }
+if(result.destination)
+document.getElementById("destination").value=result.destination;
 if(result.duration) document.getElementById("duration").value=result.duration;
 if(result.travel_date) document.getElementById("date").value=result.travel_date;
-if(result.arrival){
+if(result.pax) document.getElementById("pax").value=result.pax;
+if(result.adults) document.getElementById("adults").value=result.adults;
+if(result.children) document.getElementById("children").value=result.children;
+  if(result.arrival){
 
 if(typeof result.arrival === "object"){
 document.getElementById("arrival").value =
@@ -179,9 +198,16 @@ if(result.exclusions){
 document.getElementById("exclusions").value =
 Array.isArray(result.exclusions) ? result.exclusions.join("\n") : result.exclusions;
 }
-
+if(result.itinerary){
+document.getElementById("itinerary").value =
+Array.isArray(result.itinerary)
+? result.itinerary.join("\n")
+: result.itinerary;
 }
 
+function printQuote(){
+window.print();
+}
 </script>
 
 </body>
