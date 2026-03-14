@@ -1,126 +1,166 @@
-<script>
-console.log("SCRIPT LOADED");
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>Travel Quotation AI Tool</title>
 
-function smartParse() {
-    let text = document.getElementById("roughQuote").value;
-    let lines = text.split("\n");
-    let section = "";
-    let inclusionsText = "";
-    let exclusionsText = "";
-
-    for (let i = 0; i < lines.length; i++) {
-        let clean = lines[i].trim();
-        let lower = clean.toLowerCase();
-        if (clean === "") continue;
-
-        if (lower.includes("destination")) {
-            let val = clean.split(":")[1];
-            if (val) document.getElementById("destination").value = val.trim();
-        }
-        if (lower.includes("package cost")) {
-            let price = clean.match(/[0-9,]+/);
-            if (price) document.getElementById("price1").value = "₹" + price[0];
-        }
-        if (lower.includes("inclusion")) { section = "inclusions"; continue; }
-        if (lower.includes("exclusion")) { section = "exclusions"; continue; }
-
-        if (section === "inclusions") inclusionsText += clean + "\n";
-        if (section === "exclusions") exclusionsText += clean + "\n";
-    }
-    document.getElementById("inclusions").value = inclusionsText;
-    document.getElementById("exclusions").value = exclusionsText;
+<style>
+body{
+font-family: Arial;
+margin:40px;
 }
+
+textarea{
+width:100%;
+height:150px;
+}
+
+input{
+width:100%;
+padding:6px;
+margin-bottom:10px;
+}
+
+button{
+padding:10px 20px;
+background:#2c7be5;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+h3{
+margin-top:25px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2>AI Travel Quotation Extractor</h2>
+
+<h3>Paste Supplier Quotation</h3>
+<textarea id="roughQuote"></textarea>
+
+<br><br>
+<button onclick="runAI()">Extract Details with AI</button>
+
+<h3>Travel Details</h3>
+
+<label>Duration</label>
+<input id="duration">
+
+<label>Travel Date</label>
+<input id="date">
+
+<label>Arrival</label>
+<input id="arrival">
+
+<label>Departure</label>
+<input id="departure">
+
+<h3>Hotel</h3>
+
+<label>Hotel Name</label>
+<input id="hotel1">
+
+<label>Package Price</label>
+<input id="price1">
+
+<h3>Inclusions</h3>
+<textarea id="inclusions"></textarea>
+
+<h3>Exclusions</h3>
+<textarea id="exclusions"></textarea>
+
+
+<script>
 
 async function runAI(){
 
 let text = document.getElementById("roughQuote").value;
 
-let response = await fetch("https://api.openai.com/v1/chat/completions", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer YOUR_API_KEY"
-  },
-  body: JSON.stringify({
-    model: "gpt-4o-mini",
-    response_format: { type: "json_object" },
-    messages: [
-      {
-        role: "system",
-        content: "Extract travel quotation details and return JSON"
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ]
-  })
+if(!text){
+alert("Please paste quotation text first");
+return;
+}
+
+let response = await fetch("https://api.openai.com/v1/chat/completions",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer YOUR_API_KEY"
+},
+body: JSON.stringify({
+model:"gpt-4o-mini",
+response_format:{type:"json_object"},
+messages:[
+{
+role:"system",
+content:"Extract travel quotation details and return JSON with fields: duration, travel_date, arrival, departure, hotel, price, inclusions, exclusions"
+},
+{
+role:"user",
+content:text
+}
+]
+})
 });
 
 let data = await response.json();
+
 let aiResult = JSON.parse(data.choices[0].message.content);
 
-if(aiResult.duration)    document.getElementById("duration").value = aiResult.duration;
-if(aiResult.travel_date) document.getElementById("date").value = aiResult.travel_date;
-if(aiResult.arrival)     document.getElementById("arrival").value = aiResult.arrival;
-if(aiResult.departure)   document.getElementById("departure").value = aiResult.departure;
-if(aiResult.hotel)       document.getElementById("hotel1").value = aiResult.hotel;
-if(aiResult.price)       document.getElementById("price1").value = aiResult.price;
+
+/* Fill form fields */
+
+if(aiResult.duration)
+document.getElementById("duration").value = aiResult.duration;
+
+if(aiResult.travel_date)
+document.getElementById("date").value = aiResult.travel_date;
+
+if(aiResult.arrival)
+document.getElementById("arrival").value = aiResult.arrival;
+
+if(aiResult.departure)
+document.getElementById("departure").value = aiResult.departure;
+
+if(aiResult.hotel)
+document.getElementById("hotel1").value = aiResult.hotel;
+
+if(aiResult.price)
+document.getElementById("price1").value = aiResult.price;
+
+
+/* Inclusions */
 
 if(aiResult.inclusions){
+
 document.getElementById("inclusions").value =
 Array.isArray(aiResult.inclusions)
 ? aiResult.inclusions.join("\n")
 : aiResult.inclusions;
+
 }
 
+
+/* Exclusions */
+
 if(aiResult.exclusions){
+
 document.getElementById("exclusions").value =
 Array.isArray(aiResult.exclusions)
 ? aiResult.exclusions.join("\n")
 : aiResult.exclusions;
-}
 
 }
-    } catch (error) {
-        console.error("AI Error:", error);
-        alert("AI failed to extract. Ensure your API key is valid.");
-    } finally {
-        aiButton.innerText = originalText;
-        aiButton.disabled = false;
-    }
+
 }
 
-
-function generateQuotation() {
-    let destination = document.getElementById("destination").value;
-    let pax = document.getElementById("pax").value;
-    let duration = document.getElementById("duration").value;
-    let hotel = document.getElementById("hotel1").value;
-    let price = document.getElementById("price1").value;
-    let inclusions = document.getElementById("inclusions").value;
-    let exclusions = document.getElementById("exclusions").value;
-
-    document.getElementById("formArea").style.display = "none";
-    document.getElementById("output").style.display = "block";
-
-    document.getElementById("output").innerHTML = `
-        <h2 style="text-align:center">PACKAGE QUOTATION</h2>
-        <b>Destination :</b> ${destination}<br>
-        <b>Pax :</b> ${pax}<br>
-        <b>Duration :</b> ${duration}<br>
-        <hr>
-        <h3>Hotel Details</h3>
-        <b>Package Cost :</b> ${price}<br><br>
-        ${hotel.replace(/\n/g, '<br>')}
-        <h3>Inclusions</h3>
-        ${inclusions.replace(/\n/g, '<br>')}
-        <h3>Exclusions</h3>
-        ${exclusions.replace(/\n/g, '<br>')}
-    `;
-}
-
-function downloadPDF() {
-    window.print();
-}
 </script>
+
+</body>
+</html>
+```
