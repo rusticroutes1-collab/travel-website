@@ -27,6 +27,7 @@
         <h3>Paste Rough Quote</h3>
         <textarea id="roughQuote" style="height:120px;"></textarea>
         <button onclick="smartParse()">Auto Fill Fields</button>
+        <button onclick="extractWithAI()">AI Extract Quote</button>
         <hr>
 
         <label>Hotel Details</label><input id="hotel1">
@@ -76,8 +77,42 @@ function smartParse(){
     document.getElementById("exclusions").value = exclusionsText;
 }
 
+async function extractWithAI() {
+    let text = document.getElementById("roughQuote").value;
+    if(!text) return alert("Please paste a rough quote first!");
+
+    try {
+        let response = await fetch("https://api.openai.com", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer YOUR_API_KEY_HERE"
+            },
+            body: JSON.stringify({
+                model: "gpt-4o-mini",
+                messages:
+            })
+        });
+
+        let data = await response.json();
+        let aiResult = JSON.parse(data.choices[0].message.content.replace(/```json/g,'').replace(/```/g,''));
+
+        // Fill fields if AI found them
+        if(aiResult.destination) document.getElementById("destination").value = aiResult.destination;
+        if(aiResult.pax) document.getElementById("pax").value = aiResult.pax;
+        if(aiResult.duration) document.getElementById("duration").value = aiResult.duration;
+        if(aiResult.price) document.getElementById("price1").value = aiResult.price;
+        if(aiResult.hotel) document.getElementById("hotel1").value = aiResult.hotel;
+        if(aiResult.inclusions) document.getElementById("inclusions").value = Array.isArray(aiResult.inclusions) ? aiResult.inclusions.join("\n") : aiResult.inclusions;
+        if(aiResult.exclusions) document.getElementById("exclusions").value = Array.isArray(aiResult.exclusions) ? aiResult.exclusions.join("\n") : aiResult.exclusions;
+
+    } catch (error) {
+        console.error("AI Error:", error);
+        alert("AI extraction failed. Check console or API key.");
+    }
+}
+
 function generateQuotation(){
-    // Capture values
     let destination = document.getElementById("destination").value;
     let pax = document.getElementById("pax").value;
     let duration = document.getElementById("duration").value;
@@ -89,12 +124,10 @@ function generateQuotation(){
     let inclusions = document.getElementById("inclusions").value;
     let exclusions = document.getElementById("exclusions").value;
 
-    // UI Toggle
     document.getElementById("formArea").style.display = "none";
     document.getElementById("output").style.display = "block";
     document.getElementById("pdfBtn").style.display = "inline-block";
 
-    // Build Output
     document.getElementById("output").innerHTML = `
         <h2 style="text-align:center">PACKAGE QUOTATION</h2>
         <b>Destination :</b> ${destination}<br>
