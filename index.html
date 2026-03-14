@@ -41,26 +41,27 @@ async function extractWithAI() {
     aiButton.innerText = "Extracting... ✨";
     aiButton.disabled = true;
 
-    try {        let response = await fetch("https://api.openai.com", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer YOUR_API_KEY"
-            },
-body: JSON.stringify({
-  model: "gpt-4o-mini",
-  response_format: { type: "json_object" },
-  messages: [
-    {
-      role: "system",
-      content: "Extract travel quotation details and return JSON"
-    },
-    {
-      role: "user",
-      content: text
-    }
-  ]
-})
+    let response = await fetch("https://api.openai.com/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_API_KEY"
+  },
+  body: JSON.stringify({
+    model: "gpt-4o-mini",
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: "Extract travel quotation details and return JSON"
+      },
+      {
+        role: "user",
+        content: text
+      }
+    ]
+  })
+});
         if(aiResult.duration)    document.getElementById("duration").value = aiResult.duration;
         if(aiResult.travel_date) document.getElementById("date").value = aiResult.travel_date;
         if(aiResult.arrival)     document.getElementById("arrival").value = aiResult.arrival;
