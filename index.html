@@ -114,8 +114,23 @@ field.value = hotel.name + " - " + (hotel.room || "");
 }
 
 }
-if(result.price) document.getElementById("price1").value=result.price;
+if(result.price){
 
+if(typeof result.price === "object"){
+
+document.getElementById("price1").value =
+result.price.amount ||
+result.price.value ||
+result.price.total ||
+"";
+
+}else{
+
+document.getElementById("price1").value = result.price;
+
+}
+
+}
 if(result.inclusions){
 document.getElementById("inclusions").value =
 Array.isArray(result.inclusions) ? result.inclusions.join("\n") : result.inclusions;
