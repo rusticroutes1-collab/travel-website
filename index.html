@@ -41,8 +41,7 @@ async function extractWithAI() {
     aiButton.innerText = "Extracting... ✨";
     aiButton.disabled = true;
 
-    try {
-                let response = await fetch("https://api.openai.com", {
+    try {        let response = await fetch("https://api.openai.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -55,14 +54,6 @@ async function extractWithAI() {
             })
         });
 
-
-        let data = await response.json();
-        // Parse the string response into a real JavaScript object
-        let aiResult = JSON.parse(data.choices[0].message.content);
-
-        // Fill ALL fields automatically
-        if(aiResult.destination) document.getElementById("destination").value = aiResult.destination;
-        if(aiResult.pax)         document.getElementById("pax").value = aiResult.pax;
         if(aiResult.duration)    document.getElementById("duration").value = aiResult.duration;
         if(aiResult.travel_date) document.getElementById("date").value = aiResult.travel_date;
         if(aiResult.arrival)     document.getElementById("arrival").value = aiResult.arrival;
