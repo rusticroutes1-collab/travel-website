@@ -287,41 +287,29 @@ let price=document.getElementById("price1").value;
 let itinerary=document.getElementById("itinerary").value;
 let inclusions=document.getElementById("inclusions").value;
 let exclusions=document.getElementById("exclusions").value;
+document.getElementById("formArea").style.display = "none";
+document.getElementById("output").style.display = "block";
 
-document.getElementById("formArea").style.display="none";
-document.getElementById("output").style.display="block";
-
-document.getElementById("output").innerHTML=`
-
+// This opens the string, includes ALL the text, and then closes it correctly.
+document.getElementById("output").innerHTML = `
 <h2 style="text-align:center">PACKAGE QUOTATION</h2>
-
 <b>Destination :</b> ${destination}<br>
-; 
-
-let html = `<b>Pax :</b> ${pax}<br>
+<b>Pax :</b> ${pax}<br>
 <b>Duration :</b> ${duration}<br>
 <b>Travel Date :</b> ${date}<br>
 <b>Arrival :</b> ${arrival}<br>
 <b>Departure :</b> ${departure}<br>
-
 <hr>
-
 <h3>Hotel</h3>
-
 <b>Package Cost :</b> ${price}<br><br>
-
 ${hotel}
-
 <h3>Exclusions</h3>
-
 ${exclusions}
-`;
+<div id="quotation"></div>
+`; 
 
-document.getElementById("quotation").innerHTML = html;
-
-
-
-
+// If you specifically need the content in a separate "quotation" div:
+document.getElementById("quotation").innerHTML = `<b>Pax :</b> ${pax}<br>...`; 
 }
 
 function downloadPDF(){
