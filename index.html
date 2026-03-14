@@ -33,9 +33,14 @@ function smartParse() {
 
 async function extractWithAI() {
     let text = document.getElementById("roughQuote").value;
-    if (!text) return alert("Please paste a quote first!");
+    if (!text) return alert("Please paste a rough quote first!");
 
-    // Replace YOUR_API_KEY with your actual OpenAI key
+    // UI feedback so you know it's working
+    const aiButton = event.target;
+    const originalText = aiButton.innerText;
+    aiButton.innerText = "Extracting... ✨";
+    aiButton.disabled = true;
+
     try {
         let response = await fetch("https://api.openai.com", {
             method: "POST",
@@ -45,15 +50,43 @@ async function extractWithAI() {
             },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
+                // We force the AI to return ONLY JSON
+                response_format: { type: "json_object" },
                 messages:
             })
         });
+
         let data = await response.json();
-        console.log("AI Data Received:", data);
-    } catch (e) {
-        console.error("AI Error:", e);
+        // Parse the string response into a real JavaScript object
+        let aiResult = JSON.parse(data.choices[0].message.content);
+
+        // Fill ALL fields automatically
+        if(aiResult.destination) document.getElementById("destination").value = aiResult.destination;
+        if(aiResult.pax)         document.getElementById("pax").value = aiResult.pax;
+        if(aiResult.duration)    document.getElementById("duration").value = aiResult.duration;
+        if(aiResult.travel_date) document.getElementById("date").value = aiResult.travel_date;
+        if(aiResult.arrival)     document.getElementById("arrival").value = aiResult.arrival;
+        if(aiResult.departure)   document.getElementById("departure").value = aiResult.departure;
+        if(aiResult.hotel)       document.getElementById("hotel1").value = aiResult.hotel;
+        if(aiResult.price)       document.getElementById("price1").value = aiResult.price;
+        
+        // Handle multiline inclusions/exclusions
+        if(aiResult.inclusions) {
+            document.getElementById("inclusions").value = Array.isArray(aiResult.inclusions) ? aiResult.inclusions.join("\n") : aiResult.inclusions;
+        }
+        if(aiResult.exclusions) {
+            document.getElementById("exclusions").value = Array.isArray(aiResult.exclusions) ? aiResult.exclusions.join("\n") : aiResult.exclusions;
+        }
+
+    } catch (error) {
+        console.error("AI Error:", error);
+        alert("AI failed to extract. Ensure your API key is valid.");
+    } finally {
+        aiButton.innerText = originalText;
+        aiButton.disabled = false;
     }
 }
+
 
 function generateQuotation() {
     let destination = document.getElementById("destination").value;
