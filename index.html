@@ -296,25 +296,24 @@ document.getElementById("output").innerHTML=`
 <h2 style="text-align:center">PACKAGE QUOTATION</h2>
 
 <b>Destination :</b> ${destination}<br>
-<b>Pax :</b> ${pax}<br>
-let html = `<b>Pax :</b> ${pax}<br>
-<b>Duration :</b> ${duration}<br>
-<b>Travel Date :</b> ${date}<br>
-<b>Arrival :</b> ${arrival}<br>
-<b>Departure :</b> ${departure}<br>
+// Replace lines 299 through 333 with this:
+let html = `<b>Pax:</b> ${pax}<br>
+<b>Duration:</b> ${duration}<br>
+<b>Travel Date:</b> ${date}<br>
+<b>Arrival:</b> ${arrival}<br>
+<b>Departure:</b> ${departure}<br>
 
 <hr>
 
 <h3>Hotel</h3>
 
-<b>Package Cost :</b> ${price}<br><br>
+<b>Package Cost:</b> ${price}<br><br>
 
 ${hotel}
 
 <h3>Exclusions</h3>
 
-${exclusions}
-`;
+${exclusions}`;
 
 document.getElementById("quotation").innerHTML = html;
 
