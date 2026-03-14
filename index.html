@@ -208,73 +208,70 @@ let aiData = JSON.parse(aiText);
 /* Destination */
 
 if(aiData.destination){
-document.getElementById("destination").value=aiData.destination.replace(/[0-9]+N/g,"").trim();
+let el = document.getElementById("destination");
+if(el) el.value = aiData.destination;
 }
+
 
 /* Package Cost */
 
-if(aiData.packageCost){
-document.getElementById("price1").value=aiData.packageCost;
+if(aiData.package_cost){
+let el = document.getElementById("packageCost");
+if(el) el.value = aiData.package_cost;
 }
 
-/* Hotels */
-
-if(aiData.hotels){
-
-let hotelLines=aiData.hotels.map(h=>{
-
-if(typeof h==="object"){
-return (h.name||"")+" - "+(h.room_type||"");
-}
-
-return h;
-
-});
-
-document.getElementById("hotel1").value=hotelLines.join("\n\n");
-
-}
 
 /* Inclusions */
 
-if(aiData.inclusions){
-
-if(Array.isArray(aiData.inclusions)){
-
-let cleanList=aiData.inclusions.map(i=>{
-
-if(typeof i==="object"){
-return JSON.stringify(i);
+if(aiData.inclusions && aiData.inclusions.length){
+let el = document.getElementById("inclusions");
+if(el) el.value = aiData.inclusions.join("\n");
 }
 
-return i;
 
-});
+/* Exclusions */
 
-document.getElementById("inclusions").value=cleanList.join("\n");
-
-}
-else{
-document.getElementById("inclusions").value=aiData.inclusions;
+if(aiData.exclusions && aiData.exclusions.length){
+let el = document.getElementById("exclusions");
+if(el) el.value = aiData.exclusions.join("\n");
 }
 
+
+/* Hotels */
+
+if(aiData.hotels && aiData.hotels.length){
+
+for(let i=0;i<aiData.hotels.length;i++){
+
+let hotel = aiData.hotels[i];
+
+let cityField = document.getElementById("hotelCity"+(i+1));
+let nameField = document.getElementById("hotelName"+(i+1));
+let nightsField = document.getElementById("hotelNights"+(i+1));
+
+if(cityField && hotel.city) cityField.value = hotel.city;
+if(nameField && hotel.name) nameField.value = hotel.name;
+if(nightsField && hotel.nights) nightsField.value = hotel.nights;
+
 }
+
+}
+
 
 /* Itinerary */
 
-if(aiData.itinerary){
+if(aiData.itinerary && aiData.itinerary.length){
 
-if(Array.isArray(aiData.itinerary)){
-document.getElementById("itinerary").value=aiData.itinerary.join("\n");
-}
-else{
-document.getElementById("itinerary").value=aiData.itinerary;
-}
+let text = "";
+
+aiData.itinerary.forEach(day=>{
+text += day + "\n";
+});
+
+let el = document.getElementById("itinerary");
+if(el) el.value = text;
 
 }
-
-}
-
 function generateQuotation(){
 
 let destination=document.getElementById("destination").value;
