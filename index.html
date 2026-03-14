@@ -175,39 +175,22 @@ async function extractWithAI(){
 
 let text=document.getElementById("roughQuote").value;
 
-let response=await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-model:"gpt-4.1-mini",
-messages:[
+let response = await fetch("https://api.openai.com/v1/chat/completions", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+"Authorization": "Bearer YOUR_API_KEY"
+},
+body: JSON.stringify({
+model: "gpt-4o-mini",
+messages: [
 {
-role:"system",
-content:`Extract travel quotation details from the text.
-
-Return ONLY valid JSON in this structure:
-
-{
-"destination":"",
-"duration":"",
-"travelDate":"",
-"arrival":"",
-"departure":"",
-"packageCost":"",
-"hotels":[],
-"inclusions":[],
-content: JSON.stringify({
-destination:"",
-hotels:[],
-package_cost:"",
-inclusions:[],
-exclusions:[],
-itinerary:[]
-})
+role: "system",
+content: "Extract travel quotation details and return JSON with fields destination, hotels, package_cost, inclusions, exclusions, itinerary"
 },
 {
-role:"user",
-content:text
+role: "user",
+content: text
 }
 ]
 })
@@ -215,7 +198,11 @@ content:text
 
 let data = await response.json();
 
-let aiText=data.choices[0].message.content;
+let aiText = data.choices[0].message.content;
+
+aiText = aiText.replace(/```json/g,'').replace(/```/g,'');
+
+let aiData = JSON.parse(aiText);
 
 aiText=aiText.replace(/```json/g,'').replace(/```/g,'');
 
