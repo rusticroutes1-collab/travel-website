@@ -97,8 +97,32 @@ return;
 }
 if(result.duration) document.getElementById("duration").value=result.duration;
 if(result.travel_date) document.getElementById("date").value=result.travel_date;
-if(result.arrival) document.getElementById("arrival").value=result.arrival;
-if(result.departure) document.getElementById("departure").value=result.departure;
+if(result.arrival){
+
+if(typeof result.arrival === "object"){
+document.getElementById("arrival").value =
+result.arrival.city ||
+result.arrival.airport ||
+result.arrival.name ||
+"";
+}else{
+document.getElementById("arrival").value = result.arrival;
+}
+
+}
+if(result.departure){
+
+if(typeof result.departure === "object"){
+document.getElementById("departure").value =
+result.departure.city ||
+result.departure.airport ||
+result.departure.name ||
+"";
+}else{
+document.getElementById("departure").value = result.departure;
+}
+
+}
 if(result.hotels && result.hotels.length){
 
 for(let i=0;i<result.hotels.length;i++){
@@ -109,18 +133,29 @@ let field = document.getElementById("hotel"+(i+1));
 if(field){
 
 if(typeof hotel === "object"){
-
 field.value =
 (hotel.name || "") +
 (hotel.room ? " - " + hotel.room : "");
+}else{
+field.value = hotel;
+}
+
+}
+
+}
+
+}
+else if(result.hotel){
+
+if(typeof result.hotel === "object"){
+
+document.getElementById("hotel1").value =
+(result.hotel.name || "") +
+(result.hotel.room ? " - " + result.hotel.room : "");
 
 }else{
 
-field.value = hotel;
-
-}
-
-}
+document.getElementById("hotel1").value = result.hotel;
 
 }
 
