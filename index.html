@@ -196,8 +196,14 @@ Return ONLY valid JSON in this structure:
 "packageCost":"",
 "hotels":[],
 "inclusions":[],
-"itinerary":[],
-"exclusions":[]
+content: JSON.stringify({
+destination:"",
+hotels:[],
+package_cost:"",
+inclusions:[],
+exclusions:[],
+itinerary:[]
+})
 },
 {
 role:"user",
