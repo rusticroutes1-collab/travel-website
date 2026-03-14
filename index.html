@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Rustic Routes Holidays - Package Quotation</title>
-<link rel="icon" href="logo.png">
-<style>
-    body{ font-family:Arial; background:#f4f6f8; padding:40px; }
-    .container{ background:white; max-width:900px; margin:auto; padding:30px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    input, textarea{ width:100%; padding:8px; margin-top:5px; margin-bottom:15px; box-sizing: border-box; }
-    button{ padding:12px 18px; background:#2a7ae2; color:white; border:none; cursor:pointer; margin-top:10px; margin-right:10px; }
-    .output{ margin-top:30px; padding:25px; border:1px solid #ccc; background:#fafafa; line-height: 1.6; display:none; }
-    hr{ margin:25px 0; }
-</style>
+    <title>Rustic Routes Holidays - Package Quotation</title>
+    <style>
+        body{ font-family:Arial; background:#f4f6f8; padding:40px; }
+        .container{ background:white; max-width:900px; margin:auto; padding:30px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+        input, textarea{ width:100%; padding:8px; margin-top:5px; margin-bottom:15px; box-sizing: border-box; }
+        button{ padding:12px 18px; background:#2a7ae2; color:white; border:none; cursor:pointer; margin-top:10px; margin-right:10px; }
+        .output{ margin-top:30px; padding:25px; border:1px solid #ccc; background:#fafafa; line-height: 1.6; display:none; }
+    </style>
 </head>
 <body>
 
@@ -23,17 +21,15 @@
         <label>Travel Date</label><input id="date">
         <label>Arrival</label><input id="arrival">
         <label>Departure</label><input id="departure">
-
+        
         <h3>Paste Rough Quote</h3>
         <textarea id="roughQuote" style="height:120px;"></textarea>
-        <button onclick="smartParse()">Auto Fill (Basic)</button>
-        <button onclick="extractWithAI()">AI Extract (Full)</button>
+        <button onclick="smartParse()">Auto Fill</button>
+        <button onclick="extractWithAI()">AI Extract</button>
         <hr>
 
         <label>Hotel Details</label><input id="hotel1">
         <label>Package Cost</label><input id="price1">
-
-        <h3>Brief Itinerary</h3><textarea id="itinerary"></textarea>
         <h3>Inclusions</h3><textarea id="inclusions"></textarea>
         <h3>Exclusions</h3><textarea id="exclusions"></textarea>
 
@@ -56,7 +52,9 @@ function smartParse() {
         let lower = clean.toLowerCase();
         if(!clean) return;
 
-        if(lower.includes("destination")) document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
+        if(lower.includes("destination")) {
+            document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
+        }
         if(lower.includes("package cost")) {
             let p = clean.match(/[0-9,]+/);
             if(p) document.getElementById("price1").value = "₹" + p[0];
@@ -67,36 +65,22 @@ function smartParse() {
         if(section === "inc") inc += clean + "\n";
         if(section === "exc") exc += clean + "\n";
     });
+
     document.getElementById("inclusions").value = inc;
     document.getElementById("exclusions").value = exc;
 }
 
 async function extractWithAI() {
     let text = document.getElementById("roughQuote").value;
-    if(!text) return alert("Paste quote first!");
-    
-    // IMPORTANT: Replace YOUR_API_KEY with your real key
-    try {
-        let response = await fetch("https://api.openai.com", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer YOUR_API_KEY" },
-            body: JSON.stringify({
-                model: "gpt-4o-mini",
-                messages:
-            })
-        });
-        let data = await response.json();
-        console.log("AI Result:", data);
-    } catch (e) { alert("AI Error. Check console."); }
+    if(!text) return alert("Paste a quote first!");
+    alert("AI Extraction triggered! Make sure your API key is set in the code.");
+    // Add your Fetch logic here if needed
 }
 
 function generateQuotation() {
     let d = document.getElementById("destination").value;
     let p = document.getElementById("pax").value;
     let dur = document.getElementById("duration").value;
-    let dat = document.getElementById("date").value;
-    let arr = document.getElementById("arrival").value;
-    let dep = document.getElementById("departure").value;
     let htl = document.getElementById("hotel1").value;
     let prc = document.getElementById("price1").value;
     let inc = document.getElementById("inclusions").value;
@@ -107,20 +91,15 @@ function generateQuotation() {
     out.style.display = "block";
     document.getElementById("pdfBtn").style.display = "inline-block";
 
-    // CLEAN TEMPLATE LITERAL (No stray colons/breaks)
     out.innerHTML = `
         <h2 style="text-align:center">PACKAGE QUOTATION</h2>
         <b>Destination:</b> ${d}<br>
         <b>Pax:</b> ${p}<br>
         <b>Duration:</b> ${dur}<br>
-        <b>Travel Date:</b> ${dat}<br>
-        <b>Arrival:</b> ${arr}<br>
-        <b>Departure:</b> ${dep}<br>
         <hr>
         <h3>Hotel Details</h3>
-        <b>Package Cost:</b> ${prc}<br><br>
+        <b>Cost:</b> ${prc}<br><br>
         ${htl.replace(/\n/g, '<br>')}
-        <hr>
         <h3>Inclusions</h3>
         ${inc.replace(/\n/g, '<br>')}
         <h3>Exclusions</h3>
@@ -128,5 +107,6 @@ function generateQuotation() {
     `;
 }
 </script>
+
 </body>
 </html>
