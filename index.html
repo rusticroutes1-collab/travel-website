@@ -8,12 +8,12 @@
     .container{ background:white; max-width:900px; margin:auto; padding:30px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
     input, textarea{ width:100%; padding:8px; margin-top:5px; margin-bottom:15px; box-sizing: border-box; }
     button{ padding:12px 18px; background:#2a7ae2; color:white; border:none; cursor:pointer; margin-top:10px; margin-right:10px; }
-    .output{ margin-top:30px; padding:25px; border:1px solid #ccc; background:#fafafa; line-height: 1.6; }
+    .output{ margin-top:30px; padding:25px; border:1px solid #ccc; background:#fafafa; line-height: 1.6; display:none; }
     hr{ margin:25px 0; }
 </style>
 </head>
-
 <body>
+
 <div class="container">
     <div id="formArea">
         <h2 style="text-align:center">PACKAGE QUOTATION</h2>
@@ -26,8 +26,8 @@
 
         <h3>Paste Rough Quote</h3>
         <textarea id="roughQuote" style="height:120px;"></textarea>
-        <button onclick="smartParse()">Auto Fill Fields</button>
-        <button onclick="extractWithAI()">AI Extract Quote</button>
+        <button onclick="smartParse()">Auto Fill (Basic)</button>
+        <button onclick="extractWithAI()">AI Extract (Full)</button>
         <hr>
 
         <label>Hotel Details</label><input id="hotel1">
@@ -40,111 +40,91 @@
         <button onclick="generateQuotation()">Generate Quotation</button>
     </div>
 
-    <div class="output" id="output" style="display:none;"></div>
+    <div class="output" id="output"></div>
     <button id="pdfBtn" style="display:none;" onclick="window.print()">Download PDF</button>
 </div>
 
 <script>
-console.log("SCRIPT LOADED");
-
-function smartParse(){
+function smartParse() {
     let text = document.getElementById("roughQuote").value;
     let lines = text.split("\n");
     let section = "";
-    let inclusionsText = "";
-    let exclusionsText = "";
+    let inc = ""; let exc = "";
 
-    for(let i=0; i<lines.length; i++){
-        let clean = lines[i].trim();
+    lines.forEach(line => {
+        let clean = line.trim();
         let lower = clean.toLowerCase();
-        if(clean === "") continue;
+        if(!clean) return;
 
-        if(lower.includes("destination")){
-            let val = clean.split(":")[1];
-            if(val) document.getElementById("destination").value = val.trim();
+        if(lower.includes("destination")) document.getElementById("destination").value = clean.split(":")[1]?.trim() || "";
+        if(lower.includes("package cost")) {
+            let p = clean.match(/[0-9,]+/);
+            if(p) document.getElementById("price1").value = "₹" + p[0];
         }
-        if(lower.includes("package cost")){
-            let price = clean.match(/[0-9,]+/);
-            if(price) document.getElementById("price1").value = "₹" + price[0];
-        }
-        if(lower.includes("inclusion")){ section = "inclusions"; continue; }
-        if(lower.includes("exclusion")){ section = "exclusions"; continue; }
+        if(lower.includes("inclusion")) { section = "inc"; return; }
+        if(lower.includes("exclusion")) { section = "exc"; return; }
 
-        if(section === "inclusions") inclusionsText += clean + "\n";
-        if(section === "exclusions") exclusionsText += clean + "\n";
-    }
-    document.getElementById("inclusions").value = inclusionsText;
-    document.getElementById("exclusions").value = exclusionsText;
+        if(section === "inc") inc += clean + "\n";
+        if(section === "exc") exc += clean + "\n";
+    });
+    document.getElementById("inclusions").value = inc;
+    document.getElementById("exclusions").value = exc;
 }
 
 async function extractWithAI() {
     let text = document.getElementById("roughQuote").value;
-    if(!text) return alert("Please paste a rough quote first!");
-
+    if(!text) return alert("Paste quote first!");
+    
+    // IMPORTANT: Replace YOUR_API_KEY with your real key
     try {
         let response = await fetch("https://api.openai.com", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer YOUR_API_KEY_HERE"
-            },
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer YOUR_API_KEY" },
             body: JSON.stringify({
                 model: "gpt-4o-mini",
                 messages:
             })
         });
-
         let data = await response.json();
-        let aiResult = JSON.parse(data.choices[0].message.content.replace(/```json/g,'').replace(/```/g,''));
-
-        // Fill fields if AI found them
-        if(aiResult.destination) document.getElementById("destination").value = aiResult.destination;
-        if(aiResult.pax) document.getElementById("pax").value = aiResult.pax;
-        if(aiResult.duration) document.getElementById("duration").value = aiResult.duration;
-        if(aiResult.price) document.getElementById("price1").value = aiResult.price;
-        if(aiResult.hotel) document.getElementById("hotel1").value = aiResult.hotel;
-        if(aiResult.inclusions) document.getElementById("inclusions").value = Array.isArray(aiResult.inclusions) ? aiResult.inclusions.join("\n") : aiResult.inclusions;
-        if(aiResult.exclusions) document.getElementById("exclusions").value = Array.isArray(aiResult.exclusions) ? aiResult.exclusions.join("\n") : aiResult.exclusions;
-
-    } catch (error) {
-        console.error("AI Error:", error);
-        alert("AI extraction failed. Check console or API key.");
-    }
+        console.log("AI Result:", data);
+    } catch (e) { alert("AI Error. Check console."); }
 }
 
-function generateQuotation(){
-    let destination = document.getElementById("destination").value;
-    let pax = document.getElementById("pax").value;
-    let duration = document.getElementById("duration").value;
-    let date = document.getElementById("date").value;
-    let arrival = document.getElementById("arrival").value;
-    let departure = document.getElementById("departure").value;
-    let hotel = document.getElementById("hotel1").value;
-    let price = document.getElementById("price1").value;
-    let inclusions = document.getElementById("inclusions").value;
-    let exclusions = document.getElementById("exclusions").value;
+function generateQuotation() {
+    let d = document.getElementById("destination").value;
+    let p = document.getElementById("pax").value;
+    let dur = document.getElementById("duration").value;
+    let dat = document.getElementById("date").value;
+    let arr = document.getElementById("arrival").value;
+    let dep = document.getElementById("departure").value;
+    let htl = document.getElementById("hotel1").value;
+    let prc = document.getElementById("price1").value;
+    let inc = document.getElementById("inclusions").value;
+    let exc = document.getElementById("exclusions").value;
 
     document.getElementById("formArea").style.display = "none";
-    document.getElementById("output").style.display = "block";
+    let out = document.getElementById("output");
+    out.style.display = "block";
     document.getElementById("pdfBtn").style.display = "inline-block";
 
-    document.getElementById("output").innerHTML = `
+    // CLEAN TEMPLATE LITERAL (No stray colons/breaks)
+    out.innerHTML = `
         <h2 style="text-align:center">PACKAGE QUOTATION</h2>
-        <b>Destination :</b> ${destination}<br>
-        <b>Pax :</b> ${pax}<br>
-        <b>Duration :</b> ${duration}<br>
-        <b>Travel Date :</b> ${date}<br>
-        <b>Arrival :</b> ${arrival}<br>
-        <b>Departure :</b> ${departure}<br>
+        <b>Destination:</b> ${d}<br>
+        <b>Pax:</b> ${p}<br>
+        <b>Duration:</b> ${dur}<br>
+        <b>Travel Date:</b> ${dat}<br>
+        <b>Arrival:</b> ${arr}<br>
+        <b>Departure:</b> ${dep}<br>
         <hr>
         <h3>Hotel Details</h3>
-        <b>Package Cost :</b> ${price}<br><br>
-        ${hotel.replace(/\n/g, '<br>')}
+        <b>Package Cost:</b> ${prc}<br><br>
+        ${htl.replace(/\n/g, '<br>')}
         <hr>
         <h3>Inclusions</h3>
-        ${inclusions.replace(/\n/g, '<br>')}
+        ${inc.replace(/\n/g, '<br>')}
         <h3>Exclusions</h3>
-        ${exclusions.replace(/\n/g, '<br>')}
+        ${exc.replace(/\n/g, '<br>')}
     `;
 }
 </script>
