@@ -63,7 +63,7 @@ alert("Paste quotation first");
 return;
 }
 
-const response = await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev/",{
+const response = await fetch("https://weathered-mountain-83f0.rusticroutes1.workers.dev",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
@@ -86,8 +86,15 @@ content:text
 
 const data = await response.json();
 console.log(data);
-const result = JSON.parse(data.choices[0].message.content);
+let result = {};
 
+if(data.choices && data.choices.length > 0){
+result = JSON.parse(data.choices[0].message.content);
+}else{
+console.error("AI response invalid:", data);
+alert("AI response error. Check Worker.");
+return;
+}
 if(result.duration) document.getElementById("duration").value=result.duration;
 if(result.travel_date) document.getElementById("date").value=result.travel_date;
 if(result.arrival) document.getElementById("arrival").value=result.arrival;
