@@ -104,11 +104,22 @@ if(result.hotels && result.hotels.length){
 for(let i=0;i<result.hotels.length;i++){
 
 let hotel = result.hotels[i];
-
 let field = document.getElementById("hotel"+(i+1));
 
 if(field){
-field.value = hotel.name + " - " + (hotel.room || "");
+
+if(typeof hotel === "object"){
+
+field.value =
+(hotel.name || "") +
+(hotel.room ? " - " + hotel.room : "");
+
+}else{
+
+field.value = hotel;
+
+}
+
 }
 
 }
