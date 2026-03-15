@@ -90,6 +90,8 @@ body{background:white;}
 
 <h1>Travel Proposal</h1>
 
+<img src="logo.png" class="logo">
+
 </div>
 
 <!-- INPUT -->
@@ -429,7 +431,67 @@ list.appendChild(li);
 });
 
 }
+function fillForm(result){
 
+document.getElementById("destination").value=result.destination||"";
+
+document.getElementById("arrivalCity").value=result.arrival_city||"";
+
+if(result.departure_city){
+document.getElementById("departureCity").value=result.departure_city;
+}else{
+document.getElementById("departureCity").value=result.arrival_city;
+}
+
+document.getElementById("duration").value=result.duration||"";
+document.getElementById("adults").value=result.adults||"";
+document.getElementById("children").value=result.children||"";
+
+document.getElementById("optionsArea").innerHTML="";
+optionCount=0;
+
+let cityCount=result.options?.[0]?.cities?.length || 1;
+
+result.options.forEach((opt,i)=>{
+
+addOption(cityCount);
+
+let index=i+1;
+
+document.getElementById("priceOption"+index).value=opt.price||"";
+
+if(opt.cities[0]){
+
+document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
+document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
+
+}
+
+if(opt.cities[1]){
+
+document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
+document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
+
+}
+
+});
+
+createList(document.getElementById("inclusionsList"),result.inclusions);
+
+let exclusions=result.exclusions?.length?result.exclusions:[
+"Airfare unless specified",
+"Personal expenses",
+"Travel insurance",
+"Tips and porterage",
+"Early check-in / late checkout",
+"Anything not mentioned in inclusions"
+];
+
+createList(document.getElementById("exclusionsList"),exclusions);
+
+buildItinerary(document.getElementById("itineraryList"),result.itinerary);
+
+}
 /* PAGE LOAD */
 
 window.onload=function(){
