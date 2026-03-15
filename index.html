@@ -22,10 +22,6 @@ padding:15px;
 border-radius:8px;
 }
 
-.logo{
-max-height:60px;
-}
-
 .section{
 background:white;
 padding:15px;
@@ -63,34 +59,20 @@ font-weight:bold;
 color:#1f3c88;
 }
 
-/* PRINT SETTINGS */
-
 @media print{
-
 #inputSection{display:none}
 #hotelDBSection{display:none}
 #tourDBSection{display:none}
-
 button{display:none}
-
-body{
-background:white;
-}
-
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div class="header">
-
-<div></div>
 <h1>Travel Quotation</h1>
-<img src="logo.png" class="logo">
-
 </div>
 
 <div class="section" id="inputSection">
@@ -154,15 +136,11 @@ Create Date
 </div>
 
 <div class="section">
-
 <h3>Hotel Options</h3>
-
 <div id="optionsArea"></div>
-
 </div>
 
 <div class="section" id="hotelDBSection">
-
 <h3>Hotel Database</h3>
 
 City
@@ -191,30 +169,22 @@ Tour
 </div>
 
 <div class="section">
-
 <h3>Inclusions</h3>
 <div id="inclusionsList"></div>
-
 </div>
 
 <div class="section">
-
 <h3>Exclusions</h3>
 <div id="exclusionsList"></div>
-
 </div>
 
 <div class="section">
-
 <h3>Day Wise Itinerary</h3>
 <div id="itineraryList"></div>
-
 </div>
 
 <div class="section">
-
 <button onclick="window.print()">Print / Save PDF</button>
-
 </div>
 
 <script>
@@ -229,8 +199,6 @@ function addOption(){
 optionCount++;
 
 let div=document.createElement("div");
-
-div.className="section";
 
 div.innerHTML=`
 
@@ -280,6 +248,7 @@ if(!exists){
 
 hotels.push({city,name});
 localStorage.setItem("hotelDB",JSON.stringify(hotels));
+
 renderHotels();
 
 }
@@ -307,7 +276,6 @@ hotels.forEach(h=>{
 
 let li=document.createElement("li");
 li.innerText=h.city+" – "+h.name;
-
 list.appendChild(li);
 
 let opt=document.createElement("option");
@@ -339,7 +307,6 @@ tours.forEach(t=>{
 
 let li=document.createElement("li");
 li.innerText=t;
-
 list.appendChild(li);
 
 });
@@ -377,6 +344,147 @@ html+=`<p><span class='itDay'>Day ${i+1}</span> – ${item}</p>`;
 });
 
 container.innerHTML=html;
+
+}
+
+async function runAI(){
+
+let text=document.getElementById("roughQuote").value;
+let apiKey=document.getElementById("apiKey").value;
+
+let prompt=`
+Extract travel quotation details.
+
+Return JSON:
+
+{
+"destination":"",
+"arrival_city":"",
+"departure_city":"",
+"travel_date":"",
+"duration":"",
+"adults":0,
+"children":0,
+"options":[
+{
+"price":"",
+"cities":[
+{"city":"","hotel":""},
+{"city":"","hotel":""}
+]
+}
+],
+"inclusions":[],
+"exclusions":[],
+"itinerary":[]
+}
+
+Text:
+${text}
+`;
+
+let response=await fetch("https://api.openai.com/v1/chat/completions",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+apiKey
+},
+
+body:JSON.stringify({
+
+model:"gpt-4o-mini",
+
+messages:[
+{role:"system",content:"Extract travel quotation"},
+{role:"user",content:prompt}
+]
+
+})
+
+});
+
+let data=await response.json();
+
+let aiText=data.choices[0].message.content;
+
+aiText=aiText.replace(/```json|```/g,"").trim();
+
+let result={};
+
+try{
+result=JSON.parse(aiText);
+}catch(e){
+alert("AI response format error");
+return;
+}
+
+fillForm(result);
+
+}
+
+function fillForm(result){
+
+if(result.destination)
+document.getElementById("destination").value=result.destination;
+
+if(result.arrival_city)
+document.getElementById("arrivalCity").value=result.arrival_city;
+
+if(result.departure_city)
+document.getElementById("departureCity").value=result.departure_city;
+
+if(result.travel_date)
+document.getElementById("travelDate").value=result.travel_date;
+
+if(result.duration)
+document.getElementById("duration").value=result.duration;
+
+if(result.adults)
+document.getElementById("adults").value=result.adults;
+
+if(result.children)
+document.getElementById("children").value=result.children;
+
+document.getElementById("optionsArea").innerHTML="";
+optionCount=0;
+
+if(result.options){
+
+result.options.forEach((opt,i)=>{
+
+addOption();
+
+let index=i+1;
+
+document.getElementById("priceOption"+index).value=opt.price||"";
+
+if(opt.cities[0]){
+
+document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
+document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
+
+autoSaveHotel(opt.cities[0].city,opt.cities[0].hotel);
+
+}
+
+if(opt.cities[1]){
+
+document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
+document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
+
+autoSaveHotel(opt.cities[1].city,opt.cities[1].hotel);
+
+}
+
+});
+
+}
+
+createList(document.getElementById("inclusionsList"),result.inclusions);
+createList(document.getElementById("exclusionsList"),result.exclusions);
+buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 
 }
 
