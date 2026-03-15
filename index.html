@@ -2,290 +2,230 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Travel Proposal Builder</title>
+<title>Travel Quotation</title>
+
 <style>
-body{font-family:Arial;margin:20px;background:#eef2f7}
-h1{margin-top:0;color:#1f3c88}
-h3{color:#1f3c88}
-textarea,input,select{width:100%;padding:8px;margin:6px 0;border:1px solid #d0d7e2;border-radius:4px}
-.section{background:#ffffff;padding:18px;margin-bottom:18px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-button{padding:10px 16px;margin-top:10px;border:none;background:#1f6feb;color:white;border-radius:5px;cursor:pointer;font-weight:600}
-button:hover{background:#174ea6}
-
-ul{margin:8px 0 0 18px}
-
-/* Hide input section in print */
-@media print{
-#inputSection{display:none}
-button{display:none}
-textarea,input{border:none}
-body{background:white}
+body{
+font-family:Arial;
+margin:20px;
+background:#eef2f7;
 }
 
-.itDay{font-weight:bold;color:#1f3c88}
-
-.cityBlock2{display:none}
-
-.headerBox{
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
 background:#1f3c88;
 color:white;
-padding:15px 20px;
+padding:15px;
 border-radius:8px;
-margin-bottom:20px
 }
 
+.header h1{
+margin:0;
+text-align:center;
+flex:1;
+}
+
+.logo{
+max-height:60px;
+}
+
+.section{
+background:white;
+padding:15px;
+margin-top:15px;
+border-radius:8px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+input,textarea{
+width:100%;
+padding:6px;
+margin-top:5px;
+}
+
+button{
+background:#1f6feb;
+color:white;
+padding:10px 15px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+margin-top:10px;
+}
+
+ul{
+margin-left:20px;
+}
+
+.itDay{
+font-weight:bold;
+color:#1f3c88;
+}
+
+@media print{
+#inputSection{display:none;}
+button{display:none;}
+body{background:white;}
+}
 </style>
+
 </head>
+
 <body>
 
-<div class="headerBox" style="display:flex;align-items:center;justify-content:space-between">
-<div style="flex:1"></div>
-<div style="flex:2;text-align:center">
-<h1 style="margin:0">Travel Quotation</h1>
-<p style="margin:0;font-size:13px">Custom Holiday Plan – Subject to availability & final confirmation</p>
-</div>
-<div style="flex:1;text-align:right">
-<img id="companyLogo" src="" style="max-height:60px">
-</div>
+<div class="header">
+<div></div>
+<h1>Travel Quotation</h1>
+<img src="logo.png" class="logo">
 </div>
 
 <div class="section" id="inputSection">
-<label>Paste Rough Quotation / WhatsApp Text</label>
-<textarea id="roughQuote" rows="8"></textarea>
+
+<label>Paste Rough Quotation</label>
+<textarea id="roughQuote" rows="6"></textarea>
 
 <label>OpenAI API Key</label>
-<input id="apiKey" placeholder="sk-...">
+<input id="apiKey">
 
 <button onclick="runAI()">Generate Proposal</button>
+
 </div>
 
 <div class="section">
-<h3>Client & Quote Details</h3>
+
+<h3>Client Details</h3>
+
 <div class="grid">
+
 <div>
-<label>Proposal No</label>
-<input id="quoteNo" readonly>
-</div>
-<div>
-<label>Create Date</label>
-<input id="createDate" type="date">
-</div>
-<div>
-<label>Client Name</label>
+Client Name
 <input id="clientName">
 </div>
+
 <div>
-<label>Client Contact</label>
+Contact
 <input id="clientContact">
 </div>
+
+<div>
+Proposal No
+<input id="quoteNo" readonly>
 </div>
+
+<div>
+Create Date
+<input id="createDate" type="date">
+</div>
+
+</div>
+
 </div>
 
 <div class="section">
+
 <h3>Trip Details</h3>
+
 <div class="grid">
+
 <div>
-<label>Destination</label>
+Destination
 <input id="destination">
 </div>
+
 <div>
-<label>Arrival City</label>
+Arrival City
 <input id="arrivalCity">
 </div>
+
 <div>
-<label>Departure City</label>
+Departure City
 <input id="departureCity">
 </div>
+
 <div>
-<label>Travel Date</label>
+Travel Date
 <input id="travelDate">
-</div>
-<div>
-<label>Duration</label>
-<input id="duration">
-</div>
-<div>
-<label>Total Price</label>
-<input id="price1">
-</div>
-</div>
-</div>
-<div>
-<label>Travel Date</label>
-<input id="travelDate">
-</div>
-<div>
-<label>Duration</label>
-<input id="duration">
-</div>
-<div>
-<label>Total Price</label>
-<input id="price1">
-</div>
-</div>
 </div>
 
-<div class="section">
-<h3>Pax Details</h3>
-<div class="grid">
 <div>
-<label>Adults</label>
+Duration
+<input id="duration">
+</div>
+
+<div>
+Adults
 <input id="adults">
 </div>
+
 <div>
-<label>Children</label>
+Children
 <input id="children">
 </div>
-</div>
+
 </div>
 
-<div class="section" id="optionsContainer">
-<h3>Hotel Options</h3>
-<div id="optionsArea"></div>
-<button onclick="addOption()">Add Hotel Option</button>
 </div>
-
-<!-- HOTEL DATABASE -->
-<div class="section" id="hotelDatabaseSection">
-<h3>Hotel Database</h3>
-<div class="grid">
-<div>
-<label>City</label>
-<input id="hotelCityInput" placeholder="e.g. Pattaya">
-</div>
-<div>
-<label>Hotel Name</label>
-<input id="hotelNameInput" placeholder="e.g. Bella Express Pattaya">
-</div>
-</div>
-<button onclick="addHotelToDatabase()">Save Hotel</button>
-
-<label style="margin-top:10px">Search Hotels by City</label>
-<input id="hotelCitySearch" placeholder="Type city name" oninput="filterHotelsByCity()">
-<div id="hotelSearchResults"></div>
-</div>
-
-<datalist id="hotelMemory"></datalist>
 
 <div class="section">
+
+<h3>Hotel Options</h3>
+
+<div id="optionsArea"></div>
+
+<button onclick="addOption()">Add Hotel Option</button>
+
+</div>
+
+<div class="section">
+
 <h3>Inclusions</h3>
 <div id="inclusionsList"></div>
+
 </div>
 
 <div class="section">
+
 <h3>Exclusions</h3>
 <div id="exclusionsList"></div>
+
 </div>
 
 <div class="section">
+
 <h3>Day Wise Itinerary</h3>
 <div id="itineraryList"></div>
-<p style="margin-top:10px;font-size:13px;color:#666">* Itinerary subject to operational feasibility and local conditions.</p>
+
+<p style="font-size:12px;color:#666">
+* Itinerary subject to operational feasibility and local conditions.
+</p>
+
 </div>
 
 <div class="section">
-<button onclick="printQuote()">Print / Save PDF</button>
+<button onclick="window.print()">Print / Save PDF</button>
 </div>
 
 <script>
 
-/* Quote Number */
-function generateQuoteNumber(){
-let last = localStorage.getItem("lastQuoteNumber") || 0;
-last = parseInt(last) + 1;
-localStorage.setItem("lastQuoteNumber", last);
-
-let year = new Date().getFullYear();
-let number = "TP-"+year+"-"+String(last).padStart(3,"0");
-
-document.getElementById("quoteNo").value = number;
-}
-
-function setToday(){
-let today = new Date().toISOString().split('T')[0];
-document.getElementById("createDate").value = today;
-}
-
-/* API KEY */
-document.getElementById("apiKey").value = localStorage.getItem("openaiKey") || "";
-
-/* HOTEL MEMORY */
-function loadHotelMemory(){
-let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
-let list = document.getElementById("hotelMemory");
-list.innerHTML="";
-
-hotels.forEach(h=>{
-let opt=document.createElement("option");
-opt.value=h.name;
-list.appendChild(opt);
-});
-}
-
-function addHotelToDatabase(){
-let city=document.getElementById("hotelCityInput").value.trim();
-let name=document.getElementById("hotelNameInput").value.trim();
-
-if(!city || !name) return;
-
-let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
-
-hotels.push({city:city,name:name});
-
-localStorage.setItem("hotelMemory",JSON.stringify(hotels));
-
-loadHotelMemory();
-
-alert("Hotel saved to database");
-}
-
-function filterHotelsByCity(){
-let city=document.getElementById("hotelCitySearch").value.toLowerCase();
-let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
-
-let results=hotels.filter(h=>h.city.toLowerCase().includes(city));
-
-let html="<ul>";
-
-results.forEach(h=>{
-html+=`<li>${h.city} – ${h.name}</li>`;
-});
-
-html+="</ul>";
-
-if(results.length===0) html="<p>No hotels found</p>";
-
-document.getElementById("hotelSearchResults").innerHTML=html;
-}
-
-function rememberHotel(name){
-if(!name) return;
-
-let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
-
-let exists=hotels.some(h=>h.name===name);
-
-if(!exists){
-hotels.push({city:"",name:name});
-localStorage.setItem("hotelMemory",JSON.stringify(hotels));
-}
-
-loadHotelMemory();
-
-/* HOTEL OPTIONS */
 let optionCount=0;
 
 function addOption(){
+
 optionCount++;
 
 let div=document.createElement("div");
 
-div.className="section";
-div.id="option"+optionCount;
-
 div.innerHTML=`
 <h4>Option ${optionCount}</h4>
+
 Price
 <input id="priceOption${optionCount}">
 
@@ -293,114 +233,36 @@ City
 <input id="city${optionCount}_1">
 
 Hotel
-<input id="hotel${optionCount}_1" list="hotelMemory">
+<input id="hotel${optionCount}_1">
 
-<div class="cityBlock2" id="cityBlock${optionCount}_2">
-City
-<input id="city${optionCount}_2">
-Hotel
-<input id="hotel${optionCount}_2" list="hotelMemory">
-</div>
 `;
 
 document.getElementById("optionsArea").appendChild(div);
+
 }
 
 addOption();
 
-async function runAI(){
-
-let text = document.getElementById("roughQuote").value;
-let apiKey = document.getElementById("apiKey").value;
-
-localStorage.setItem("openaiKey", apiKey);
-
-let prompt = `
-Extract travel quotation details.
-
-Return JSON only.
-
-{
-  "destination": "",
-  "arrival_city": "",
-  "departure_city": "",
-  "travel_date": "",
-  "duration": "",
-  "adults": 0,
-  "children": 0,
-  "options": [
-    {
-      "price": "",
-      "cities": [
-        {"city": "", "hotel": ""}
-      ]
-    }
-  ],
-  "inclusions": [],
-  "exclusions": [],
-  "itinerary": []
-}
-
-Rules:
-- If arrival city not mentioned assume first city.
-- If departure city not mentioned assume last city.
-- If itinerary missing generate simple day wise itinerary.
-- If exclusions missing generate standard travel exclusions.
-
-Text:
-${text}
-`;
-let response = await fetch("https://api.openai.com/v1/chat/completions",{
-method:"POST",
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+apiKey
-},
-body:JSON.stringify({
-model:"gpt-4o-mini",
-messages:[
-{role:"system",content:"Extract structured travel quotation data"},
-{role:"user",content:prompt}
-]
-})
-});
-
-let data = await response.json();
-let aiText = data.choices[0].message.content;
-aiText = aiText.replace(/```json|```/g,"").trim();
-
-let start = aiText.indexOf("{");
-let end = aiText.lastIndexOf("}");
-
-if(start !== -1 && end !== -1){
-aiText = aiText.substring(start,end+1);
-}
-
-let result={};
-
-try{
-result=JSON.parse(aiText);
-}catch(e){
-console.error("JSON parse error",e);
-alert("AI response format error");
-return;
-}
-
-fillForm(result);
-}
-
 function createList(container,data){
+
 if(!data) return;
+
 let arr = Array.isArray(data) ? data : data.split("\n");
+
 let html="<ul>";
+
 arr.forEach(item=>{
 if(item && item.trim()) html+="<li>"+item+"</li>";
 });
+
 html+="</ul>";
+
 container.innerHTML=html;
+
 }
 
 function buildItinerary(container,data){
+
 if(!data) return;
 
 let html="";
@@ -416,9 +278,79 @@ text = item.description || item.activity || item.text || JSON.stringify(item);
 }
 
 html += `<p><span class='itDay'>Day ${i+1}</span> – ${text}</p>`;
+
 });
 
-container.innerHTML = html;
+container.innerHTML=html;
+
+}
+
+async function runAI(){
+
+let text=document.getElementById("roughQuote").value;
+let apiKey=document.getElementById("apiKey").value;
+
+let prompt = `
+Extract travel quotation details.
+
+Return JSON only.
+
+{
+"destination":"",
+"arrival_city":"",
+"departure_city":"",
+"travel_date":"",
+"duration":"",
+"adults":0,
+"children":0,
+"inclusions":[],
+"exclusions":[],
+"itinerary":[]
+}
+
+Text:
+${text}
+`;
+
+let response = await fetch("https://api.openai.com/v1/chat/completions",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+apiKey
+},
+
+body:JSON.stringify({
+
+model:"gpt-4o-mini",
+
+messages:[
+{role:"system",content:"Extract travel quotation data"},
+{role:"user",content:prompt}
+]
+
+})
+
+});
+
+let data = await response.json();
+
+let aiText = data.choices[0].message.content;
+
+aiText = aiText.replace(/```json|```/g,"").trim();
+
+let result={};
+
+try{
+result=JSON.parse(aiText);
+}catch(e){
+alert("AI response format error");
+return;
+}
+
+fillForm(result);
+
 }
 
 function fillForm(result){
@@ -444,57 +376,39 @@ document.getElementById("adults").value=result.adults;
 if(result.children)
 document.getElementById("children").value=result.children;
 
-if(result.options){
-
-result.options.forEach((opt,i)=>{
-
-if(i>=optionCount) addOption();
-
-let index=i+1;
-
-if(opt.price)
-document.getElementById("priceOption"+index).value=opt.price;
-
-if(opt.cities && opt.cities[0]){
-
-let c1=opt.cities[0];
-
-document.getElementById("city"+index+"_1").value=c1.city||"";
-document.getElementById("hotel"+index+"_1").value=c1.hotel||"";
-
-rememberHotel(c1.hotel);
-}
-
-if(opt.cities && opt.cities[1]){
-
-let block=document.getElementById("cityBlock"+index+"_2");
-block.style.display="block";
-
-let c2=opt.cities[1];
-
-document.getElementById("city"+index+"_2").value=c2.city||"";
-document.getElementById("hotel"+index+"_2").value=c2.hotel||"";
-
-rememberHotel(c2.hotel);
-}
-
-});
-
-}
-
 createList(document.getElementById("inclusionsList"),result.inclusions);
+
 createList(document.getElementById("exclusionsList"),result.exclusions);
 
 buildItinerary(document.getElementById("itineraryList"),result.itinerary);
+
 }
 
-function printQuote(){
-window.print();
+function setToday(){
+let today = new Date().toISOString().split('T')[0];
+document.getElementById("createDate").value = today;
+}
+
+function generateQuoteNumber(){
+
+let last = localStorage.getItem("lastQuoteNumber") || 0;
+
+last = parseInt(last) + 1;
+
+localStorage.setItem("lastQuoteNumber", last);
+
+let year = new Date().getFullYear();
+
+document.getElementById("quoteNo").value =
+"TP-"+year+"-"+String(last).padStart(3,"0");
+
 }
 
 window.onload=function(){
+
 setToday();
 generateQuoteNumber();
+
 };
 
 </script>
