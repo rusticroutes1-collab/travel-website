@@ -37,7 +37,29 @@ textarea,input{border:none}
 </div>
 
 <div class="section">
-<h3>Basic Details</h3>
+<h3>Client & Quote Details</h3>
+<div class="grid">
+<div>
+<label>Quotation No</label>
+<input id="quoteNo" readonly>
+</div>
+<div>
+<label>Create Date</label>
+<input id="createDate" type="date">
+</div>
+<div>
+<label>Client Name</label>
+<input id="clientName">
+</div>
+<div>
+<label>Client Phone / Email</label>
+<input id="clientContact">
+</div>
+</div>
+</div>
+
+<div class="section">
+<h3>Trip Details</h3>
 <div class="grid">
 <div>
 <label>Destination</label>
@@ -54,6 +76,7 @@ textarea,input{border:none}
 <div>
 <label>Total Price</label>
 <input id="price1">
+</div>
 </div>
 </div>
 </div>
@@ -100,6 +123,30 @@ textarea,input{border:none}
 </div>
 
 <script>
+
+/* AUTO QUOTATION NUMBER */
+function generateQuoteNumber(){
+let last = localStorage.getItem("lastQuoteNumber") || 0;
+last = parseInt(last) + 1;
+localStorage.setItem("lastQuoteNumber", last);
+
+let year = new Date().getFullYear();
+let number = "QTN-"+year+"-"+String(last).padStart(3,"0");
+
+document.getElementById("quoteNo").value = number;
+}
+
+/* DEFAULT DATE */
+function setToday(){
+let today = new Date().toISOString().split('T')[0];
+document.getElementById("createDate").value = today;
+}
+
+window.onload=function(){
+setToday();
+generateQuoteNumber();
+};
+
 
 /* API KEY MEMORY */
 document.getElementById("apiKey").value = localStorage.getItem("openaiKey") || "";
