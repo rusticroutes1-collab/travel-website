@@ -310,48 +310,41 @@ addOption();
 
 async function runAI(){
 
-let text=document.getElementById("roughQuote").value;
-let apiKey=document.getElementById("apiKey").value;
+let text = document.getElementById("roughQuote").value;
+let apiKey = document.getElementById("apiKey").value;
 
-localStorage.setItem("openaiKey",apiKey);
+localStorage.setItem("openaiKey", apiKey);
 
 let prompt = `
-Extract travel quotation details from the following text.
+Extract travel quotation details.
 
-Return ONLY valid JSON in this format:
+Return JSON only.
 
 {
-  "destination": "",
-  "arrival_city": "",
-  "departure_city": "",
-  "travel_date": "",
-  "duration": "",
-  "adults": 0,
-  "children": 0,
-  "options": [
-    {
-      "price": "",
-      "cities": [
-        {"city": "", "hotel": ""}
-      ]
-    }
-  ],
-  "inclusions": [],
-  "exclusions": [],
-  "itinerary": []
+  "destination":"",
+  "arrival_city":"",
+  "departure_city":"",
+  "travel_date":"",
+  "duration":"",
+  "adults":0,
+  "children":0,
+  "options":[{"price":"","cities":[{"city":"","hotel":""}]}],
+  "inclusions":[],
+  "exclusions":[],
+  "itinerary":[]
 }
 
 Rules:
-- If arrival city is not mentioned use the first city.
-- If departure city is not mentioned use the last city.
-- If itinerary is missing generate a simple day-wise itinerary.
-- If exclusions are missing generate standard travel exclusions.
+- If arrival city not mentioned assume first city in itinerary.
+- If departure city not mentioned assume last city.
+- If itinerary missing create simple day wise itinerary.
+- If exclusions missing generate standard travel exclusions.
 
 Text:
 ${text}
 `;
 
-let response=await fetch("https://api.openai.com/v1/chat/completions",{
+let response = await fetch("https://api.openai.com/v1/chat/completions",{
 method:"POST",
 headers:{
 "Content-Type":"application/json",
@@ -366,9 +359,8 @@ messages:[
 })
 });
 
-let data=await response.json();
-
-let aiText=data.choices[0].message.content;
+let data = await response.json();
+let aiText = data.choices[0].message.content;
 aiText = aiText.replace(/```json|```/g,"").trim();
 
 let start = aiText.indexOf("{");
