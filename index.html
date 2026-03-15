@@ -107,6 +107,36 @@ background:white;
 
 <div class="section">
 
+<h3>Client Details</h3>
+
+<div class="grid">
+
+<div>
+Client Name
+<input id="clientName">
+</div>
+
+<div>
+Client Contact
+<input id="clientContact">
+</div>
+
+<div>
+Proposal No
+<input id="quoteNo" readonly>
+</div>
+
+<div>
+Create Date
+<input id="createDate" type="date">
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
 <h3>Trip Details</h3>
 
 <div class="grid">
@@ -350,152 +380,20 @@ container.innerHTML=html;
 
 }
 
-async function runAI(){
-
-let text=document.getElementById("roughQuote").value;
-let apiKey=document.getElementById("apiKey").value;
-
-let prompt=`
-Extract travel quotation details including hotel options and package cost.
-
-Return JSON:
-
-{
-"destination":"",
-"arrival_city":"",
-"departure_city":"",
-"travel_date":"",
-"duration":"",
-"adults":0,
-"children":0,
-"options":[
-{
-"price":"",
-"cities":[
-{"city":"","hotel":""},
-{"city":"","hotel":""}
-]
-}
-],
-"inclusions":[],
-"exclusions":[],
-"itinerary":[]
-}
-
-Text:
-${text}
-`;
-
-let response=await fetch("https://api.openai.com/v1/chat/completions",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+apiKey
-},
-
-body:JSON.stringify({
-
-model:"gpt-4o-mini",
-
-messages:[
-{role:"system",content:"Extract travel quotation"},
-{role:"user",content:prompt}
-]
-
-})
-
-});
-
-let data=await response.json();
-
-let aiText=data.choices[0].message.content;
-
-aiText=aiText.replace(/```json|```/g,"").trim();
-
-let result={};
-
-try{
-result=JSON.parse(aiText);
-}catch(e){
-alert("AI response format error");
-return;
-}
-
-fillForm(result);
-
-}
-
-function fillForm(result){
-
-if(result.destination)
-document.getElementById("destination").value=result.destination;
-
-if(result.arrival_city)
-document.getElementById("arrivalCity").value=result.arrival_city;
-
-if(result.departure_city)
-document.getElementById("departureCity").value=result.departure_city;
-
-if(result.travel_date)
-document.getElementById("travelDate").value=result.travel_date;
-
-if(result.duration)
-document.getElementById("duration").value=result.duration;
-
-if(result.adults)
-document.getElementById("adults").value=result.adults;
-
-if(result.children)
-document.getElementById("children").value=result.children;
-
-document.getElementById("optionsArea").innerHTML="";
-optionCount=0;
-
-if(result.options){
-
-result.options.forEach((opt,i)=>{
-
-addOption();
-
-let index=i+1;
-
-document.getElementById("priceOption"+index).value=opt.price||"";
-
-if(opt.cities[0]){
-
-document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
-document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
-
-autoSaveHotel(opt.cities[0].city,opt.cities[0].hotel);
-
-}
-
-if(opt.cities[1]){
-
-document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
-document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
-
-autoSaveHotel(opt.cities[1].city,opt.cities[1].hotel);
-
-}
-
-});
-
-}
-
-createList(document.getElementById("inclusionsList"),result.inclusions);
-createList(document.getElementById("exclusionsList"),result.exclusions);
-buildItinerary(document.getElementById("itineraryList"),result.itinerary);
-
-}
-
 window.onload=function(){
 
 renderHotels();
 renderTours();
 addOption();
+
+let today=new Date().toISOString().split('T')[0];
+document.getElementById("createDate").value=today;
+
+let last=localStorage.getItem("quoteNo")||0;
+last=parseInt(last)+1;
+localStorage.setItem("quoteNo",last);
+
+document.getElementById("quoteNo").value="TP-"+new Date().getFullYear()+"-"+String(last).padStart(3,"0");
 
 }
 
