@@ -12,7 +12,6 @@ textarea,input{width:100%;padding:8px;margin:6px 0}
 button{padding:10px 14px;margin-top:10px;border:none;background:#0077cc;color:white;border-radius:4px;cursor:pointer}
 button:hover{background:#005fa3}
 
-/* PRINT SETTINGS */
 @media print{
 #inputSection{display:none}
 button{display:none}
@@ -28,7 +27,7 @@ ul{margin:5px 0 0 18px}
 
 <div class="section" id="inputSection">
 <label>Paste Rough Quotation / WhatsApp Text</label>
-<textarea id="roughQuote" rows="8" placeholder="Paste travel text here..."></textarea>
+<textarea id="roughQuote" rows="8"></textarea>
 
 <label>OpenAI API Key</label>
 <input id="apiKey" placeholder="sk-...">
@@ -73,49 +72,52 @@ ul{margin:5px 0 0 18px}
 </div>
 
 <div class="section">
-<h3>City & Hotel Details</h3>
-<div class="grid">
-<div>
-<label>City 1</label>
-<input id="city1">
-<label>Hotel 1</label>
-<input id="hotel1">
-<label>Nights</label>
-<input id="hotelNights1">
+<h3>Hotel Option 1</h3>
+Price
+<input id="priceOption1">
+
+City
+<input id="opt1city1" list="hotelMemory">
+Hotel
+<input id="opt1hotel1" list="hotelMemory">
+
+City
+<input id="opt1city2" list="hotelMemory">
+Hotel
+<input id="opt1hotel2" list="hotelMemory">
 </div>
-<div>
-<label>City 2</label>
-<input id="city2">
-<label>Hotel 2</label>
-<input id="hotel2">
-<label>Nights</label>
-<input id="hotelNights2">
+
+<div class="section">
+<h3>Hotel Option 2</h3>
+Price
+<input id="priceOption2">
+
+City
+<input id="opt2city1" list="hotelMemory">
+Hotel
+<input id="opt2hotel1" list="hotelMemory">
+
+City
+<input id="opt2city2" list="hotelMemory">
+Hotel
+<input id="opt2hotel2" list="hotelMemory">
 </div>
-<div>
-<label>City 3</label>
-<input id="city3">
-<label>Hotel 3</label>
-<input id="hotel3">
-<label>Nights</label>
-<input id="hotelNights3">
-</div>
-</div>
-</div>
+
+<datalist id="hotelMemory"></datalist>
 
 <div class="section">
 <h3>Inclusions</h3>
 <div id="inclusionsList"></div>
-<textarea id="inclusions" rows="4" style="display:none"></textarea>
+</div>
 
+<div class="section">
 <h3>Exclusions</h3>
 <div id="exclusionsList"></div>
-<textarea id="exclusions" rows="4" style="display:none"></textarea>
 </div>
 
 <div class="section">
 <h3>Day Wise Itinerary</h3>
 <div id="itineraryList"></div>
-<textarea id="itinerary" rows="8" style="display:none"></textarea>
 </div>
 
 <div class="section">
@@ -124,8 +126,37 @@ ul{margin:5px 0 0 18px}
 
 <script>
 
-/* SAVE API KEY */
+/* LOAD SAVED API KEY */
 document.getElementById("apiKey").value = localStorage.getItem("openaiKey") || "";
+
+/* LOAD HOTEL MEMORY */
+function loadHotelMemory(){
+let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
+let list = document.getElementById("hotelMemory");
+list.innerHTML="";
+
+hotels.forEach(h=>{
+let opt=document.createElement("option");
+opt.value=h;
+list.appendChild(opt);
+});
+}
+
+loadHotelMemory();
+
+/* SAVE HOTEL MEMORY */
+function rememberHotel(name){
+if(!name) return;
+
+let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
+
+if(!hotels.includes(name)){
+hotels.push(name);
+localStorage.setItem("hotelMemory",JSON.stringify(hotels));
+}
+
+loadHotelMemory();
+}
 
 async function runAI(){
 
@@ -136,7 +167,7 @@ localStorage.setItem("openaiKey",apiKey);
 
 let prompt=`Extract travel quotation details.
 
-Return ONLY JSON.
+Return JSON only.
 
 {
 "destination":"",
@@ -144,15 +175,27 @@ Return ONLY JSON.
 "duration":"",
 "adults":0,
 "children":0,
-"cities":[{"city":"","hotel":"","nights":0}],
+
+"options":[
+{
+"name":"Option 1",
 "price":"",
+"cities":[{"city":"","hotel":"","nights":0}]
+},
+{
+"name":"Option 2",
+"price":"",
+"cities":[{"city":"","hotel":"","nights":0}]
+}
+],
+
 "inclusions":[],
 "exclusions":[],
 "itinerary":[]
 }
 
-If exclusions are not mentioned generate standard travel exclusions.
-If itinerary missing create simple day wise itinerary.
+If exclusions missing generate common exclusions.
+If itinerary missing generate simple day wise itinerary.
 
 Text:\n${text}`;
 
@@ -199,21 +242,14 @@ fillForm(result);
 }
 
 function createList(container,data){
-
 if(!data) return;
-
 let arr = Array.isArray(data) ? data : data.split("\n");
-
 let html="<ul>";
-
 arr.forEach(item=>{
 if(item && item.trim()) html+="<li>"+item+"</li>";
 });
-
 html+="</ul>";
-
 container.innerHTML=html;
-
 }
 
 function fillForm(result){
@@ -227,28 +263,51 @@ document.getElementById("travelDate").value=result.travel_date;
 if(result.duration)
 document.getElementById("duration").value=result.duration;
 
-if(result.price)
-document.getElementById("price1").value=result.price;
-
 if(result.adults)
 document.getElementById("adults").value=result.adults;
 
 if(result.children)
 document.getElementById("children").value=result.children;
 
-if(result.cities && result.cities.length){
+if(result.options && result.options.length){
 
-for(let i=0;i<result.cities.length;i++){
+let opt1=result.options[0];
+let opt2=result.options[1];
 
-let cityField=document.getElementById("city"+(i+1));
-let hotelField=document.getElementById("hotel"+(i+1));
-let nightsField=document.getElementById("hotelNights"+(i+1));
+if(opt1){
+document.getElementById("priceOption1").value=opt1.price||"";
 
-if(cityField) cityField.value=result.cities[i].city || "";
-if(hotelField) hotelField.value=result.cities[i].hotel || "";
-if(nightsField) nightsField.value=result.cities[i].nights || "";
+if(opt1.cities && opt1.cities.length){
 
+document.getElementById("opt1city1").value=opt1.cities[0]?.city||"";
+document.getElementById("opt1hotel1").value=opt1.cities[0]?.hotel||"";
+rememberHotel(opt1.cities[0]?.hotel);
+
+if(opt1.cities[1]){
+document.getElementById("opt1city2").value=opt1.cities[1].city||"";
+document.getElementById("opt1hotel2").value=opt1.cities[1].hotel||"";
+rememberHotel(opt1.cities[1].hotel);
 }
+}
+}
+
+if(opt2){
+document.getElementById("priceOption2").value=opt2.price||"";
+
+if(opt2.cities && opt2.cities.length){
+
+document.getElementById("opt2city1").value=opt2.cities[0]?.city||"";
+document.getElementById("opt2hotel1").value=opt2.cities[0]?.hotel||"";
+rememberHotel(opt2.cities[0]?.hotel);
+
+if(opt2.cities[1]){
+document.getElementById("opt2city2").value=opt2.cities[1].city||"";
+document.getElementById("opt2hotel2").value=opt2.cities[1].hotel||"";
+rememberHotel(opt2.cities[1].hotel);
+}
+}
+}
+
 }
 
 createList(document.getElementById("inclusionsList"),result.inclusions);
