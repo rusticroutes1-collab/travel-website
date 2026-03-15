@@ -369,9 +369,72 @@ document.getElementById("adults").value=result.adults;
 if(result.children)
 document.getElementById("children").value=result.children;
 
-createList(document.getElementById("inclusionsList"),result.inclusions);
-createList(document.getElementById("exclusionsList"),result.exclusions);
-buildItinerary(document.getElementById("itineraryList"),result.itinerary);
+/* CLEAR OLD OPTIONS */
+
+document.getElementById("optionsArea").innerHTML="";
+optionCount=0;
+
+/* CREATE HOTEL OPTIONS */
+
+if(result.options){
+
+result.options.forEach((opt,i)=>{
+
+addOption();
+
+let index=i+1;
+
+if(opt.price)
+document.getElementById("priceOption"+index).value=opt.price;
+
+/* FIRST CITY */
+
+if(opt.cities && opt.cities[0]){
+
+document.getElementById("city"+index+"_1").value=
+opt.cities[0].city || "";
+
+document.getElementById("hotel"+index+"_1").value=
+opt.cities[0].hotel || "";
+
+}
+
+/* SECOND CITY */
+
+if(opt.cities && opt.cities[1]){
+
+document.getElementById("city"+index+"_2").value=
+opt.cities[1].city || "";
+
+document.getElementById("hotel"+index+"_2").value=
+opt.cities[1].hotel || "";
+
+}
+
+});
+
+}
+
+/* INCLUSIONS */
+
+createList(
+document.getElementById("inclusionsList"),
+result.inclusions
+);
+
+/* EXCLUSIONS */
+
+createList(
+document.getElementById("exclusionsList"),
+result.exclusions
+);
+
+/* ITINERARY */
+
+buildItinerary(
+document.getElementById("itineraryList"),
+result.itinerary
+);
 
 }
 
