@@ -63,9 +63,20 @@ font-weight:bold;
 color:#1f3c88;
 }
 
+/* PRINT SETTINGS */
+
 @media print{
+
 #inputSection{display:none}
+#hotelDBSection{display:none}
+#tourDBSection{display:none}
+
 button{display:none}
+
+body{
+background:white;
+}
+
 }
 
 </style>
@@ -77,9 +88,7 @@ button{display:none}
 <div class="header">
 
 <div></div>
-
 <h1>Travel Quotation</h1>
-
 <img src="logo.png" class="logo">
 
 </div>
@@ -93,36 +102,6 @@ button{display:none}
 <input id="apiKey">
 
 <button onclick="runAI()">Generate Proposal</button>
-
-</div>
-
-<div class="section">
-
-<h3>Client Details</h3>
-
-<div class="grid">
-
-<div>
-Client Name
-<input id="clientName">
-</div>
-
-<div>
-Contact
-<input id="clientContact">
-</div>
-
-<div>
-Proposal No
-<input id="quoteNo" readonly>
-</div>
-
-<div>
-Create Date
-<input id="createDate" type="date">
-</div>
-
-</div>
 
 </div>
 
@@ -152,7 +131,7 @@ Create Date
 
 </div>
 
-<div class="section">
+<div class="section" id="hotelDBSection">
 
 <h3>Hotel Database</h3>
 
@@ -168,7 +147,7 @@ Hotel
 
 </div>
 
-<div class="section">
+<div class="section" id="tourDBSection">
 
 <h3>Tour Database</h3>
 
@@ -200,23 +179,20 @@ Tour
 <h3>Day Wise Itinerary</h3>
 <div id="itineraryList"></div>
 
-<p style="font-size:12px;color:#666">
-* Itinerary subject to operational feasibility.
-</p>
-
 </div>
 
 <div class="section">
+
 <button onclick="window.print()">Print / Save PDF</button>
+
 </div>
 
 <script>
 
 let optionCount=0;
+
 let hotels = JSON.parse(localStorage.getItem("hotelDB")||"[]");
 let tours = JSON.parse(localStorage.getItem("tourDB")||"[]");
-
-/* HOTEL OPTION CREATOR */
 
 function addOption(){
 
@@ -227,6 +203,7 @@ let div=document.createElement("div");
 div.className="section";
 
 div.innerHTML=`
+
 <h4>Option ${optionCount}</h4>
 
 Package Cost
@@ -236,20 +213,19 @@ City 1
 <input id="city${optionCount}_1">
 
 Hotel 1
-<input id="hotel${optionCount}_1">
+<input id="hotel${optionCount}_1" list="hotelSuggestions">
 
 City 2
 <input id="city${optionCount}_2">
 
 Hotel 2
-<input id="hotel${optionCount}_2">
+<input id="hotel${optionCount}_2" list="hotelSuggestions">
+
 `;
 
 document.getElementById("optionsArea").appendChild(div);
 
 }
-
-/* HOTEL DATABASE */
 
 function saveHotel(){
 
@@ -264,22 +240,53 @@ renderHotels();
 
 }
 
+function autoSaveHotel(city,name){
+
+if(!name) return;
+
+let exists=hotels.some(h=>h.name===name);
+
+if(!exists){
+
+hotels.push({city,name});
+localStorage.setItem("hotelDB",JSON.stringify(hotels));
+renderHotels();
+
+}
+
+}
+
 function renderHotels(){
 
 let list=document.getElementById("hotelList");
 list.innerHTML="";
 
+let dataList=document.getElementById("hotelSuggestions");
+
+if(!dataList){
+
+dataList=document.createElement("datalist");
+dataList.id="hotelSuggestions";
+document.body.appendChild(dataList);
+
+}
+
+dataList.innerHTML="";
+
 hotels.forEach(h=>{
 
 let li=document.createElement("li");
 li.innerText=h.city+" – "+h.name;
+
 list.appendChild(li);
+
+let opt=document.createElement("option");
+opt.value=h.name;
+dataList.appendChild(opt);
 
 });
 
 }
-
-/* TOUR DATABASE */
 
 function saveTour(){
 
@@ -302,13 +309,12 @@ tours.forEach(t=>{
 
 let li=document.createElement("li");
 li.innerText=t;
+
 list.appendChild(li);
 
 });
 
 }
-
-/* LIST BUILDER */
 
 function createList(container,data){
 
@@ -328,8 +334,6 @@ container.innerHTML=html;
 
 }
 
-/* ITINERARY BUILDER */
-
 function buildItinerary(container,data){
 
 if(!data) return;
@@ -345,8 +349,6 @@ html+=`<p><span class='itDay'>Day ${i+1}</span> – ${item}</p>`;
 container.innerHTML=html;
 
 }
-
-/* AI PARSER */
 
 async function runAI(){
 
@@ -425,8 +427,6 @@ fillForm(result);
 
 }
 
-/* FILL FORM */
-
 function fillForm(result){
 
 if(result.destination)
@@ -468,12 +468,16 @@ if(opt.cities[0]){
 document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
 document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
 
+autoSaveHotel(opt.cities[0].city,opt.cities[0].hotel);
+
 }
 
 if(opt.cities[1]){
 
 document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
 document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
+
+autoSaveHotel(opt.cities[1].city,opt.cities[1].hotel);
 
 }
 
@@ -487,22 +491,11 @@ buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 
 }
 
-/* INITIAL PAGE LOAD */
-
 window.onload=function(){
 
 renderHotels();
 renderTours();
 addOption();
-
-let today=new Date().toISOString().split('T')[0];
-document.getElementById("createDate").value=today;
-
-let last=localStorage.getItem("quoteNo")||0;
-last=parseInt(last)+1;
-localStorage.setItem("quoteNo",last);
-
-document.getElementById("quoteNo").value="TP-"+new Date().getFullYear()+"-"+String(last).padStart(3,"0");
 
 }
 
