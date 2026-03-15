@@ -321,29 +321,35 @@ Extract travel quotation details.
 Return JSON only.
 
 {
-  "destination":"",
-  "arrival_city":"",
-  "departure_city":"",
-  "travel_date":"",
-  "duration":"",
-  "adults":0,
-  "children":0,
-  "options":[{"price":"","cities":[{"city":"","hotel":""}]}],
-  "inclusions":[],
-  "exclusions":[],
-  "itinerary":[]
+  "destination": "",
+  "arrival_city": "",
+  "departure_city": "",
+  "travel_date": "",
+  "duration": "",
+  "adults": 0,
+  "children": 0,
+  "options": [
+    {
+      "price": "",
+      "cities": [
+        {"city": "", "hotel": ""}
+      ]
+    }
+  ],
+  "inclusions": [],
+  "exclusions": [],
+  "itinerary": []
 }
 
 Rules:
-- If arrival city not mentioned assume first city in itinerary.
+- If arrival city not mentioned assume first city.
 - If departure city not mentioned assume last city.
-- If itinerary missing create simple day wise itinerary.
+- If itinerary missing generate simple day wise itinerary.
 - If exclusions missing generate standard travel exclusions.
 
 Text:
 ${text}
 `;
-
 let response = await fetch("https://api.openai.com/v1/chat/completions",{
 method:"POST",
 headers:{
