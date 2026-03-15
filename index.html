@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Travel Quotation</title>
+<title>Travel Proposal</title>
 
 <style>
 
@@ -11,6 +11,8 @@ font-family:Arial;
 background:#eef2f7;
 margin:20px;
 }
+
+/* HEADER */
 
 .header{
 display:flex;
@@ -21,6 +23,12 @@ color:white;
 padding:15px;
 border-radius:8px;
 }
+
+.logo{
+height:60px;
+}
+
+/* SECTION */
 
 .section{
 background:white;
@@ -52,18 +60,22 @@ cursor:pointer;
 margin-top:10px;
 }
 
-ul{margin-left:20px;}
-
 .itDay{
 font-weight:bold;
 color:#1f3c88;
 }
 
+/* PRINT */
+
 @media print{
+
 #inputSection{display:none}
 #hotelDBSection{display:none}
 #tourDBSection{display:none}
 button{display:none}
+
+body{background:white;}
+
 }
 
 </style>
@@ -72,8 +84,14 @@ button{display:none}
 <body>
 
 <div class="header">
-<h1>Travel Quotation</h1>
+
+<h1>Travel Proposal</h1>
+
+<img src="logo.png" class="logo">
+
 </div>
+
+<!-- ROUGH INPUT -->
 
 <div class="section" id="inputSection">
 
@@ -86,6 +104,8 @@ button{display:none}
 <button onclick="runAI()">Generate Proposal</button>
 
 </div>
+
+<!-- CLIENT DETAILS -->
 
 <div class="section">
 
@@ -117,6 +137,8 @@ Create Date
 
 </div>
 
+<!-- TRIP DETAILS -->
+
 <div class="section">
 
 <h3>Trip Details</h3>
@@ -135,12 +157,20 @@ Create Date
 
 </div>
 
+<!-- HOTEL OPTIONS -->
+
 <div class="section">
+
 <h3>Hotel Options</h3>
+
 <div id="optionsArea"></div>
+
 </div>
 
+<!-- HOTEL DATABASE -->
+
 <div class="section" id="hotelDBSection">
+
 <h3>Hotel Database</h3>
 
 City
@@ -155,6 +185,8 @@ Hotel
 
 </div>
 
+<!-- TOUR DATABASE -->
+
 <div class="section" id="tourDBSection">
 
 <h3>Tour Database</h3>
@@ -168,35 +200,55 @@ Tour
 
 </div>
 
+<!-- INCLUSIONS -->
+
 <div class="section">
+
 <h3>Inclusions</h3>
 <div id="inclusionsList"></div>
+
 </div>
 
+<!-- EXCLUSIONS -->
+
 <div class="section">
+
 <h3>Exclusions</h3>
 <div id="exclusionsList"></div>
+
 </div>
 
+<!-- ITINERARY -->
+
 <div class="section">
+
 <h3>Day Wise Itinerary</h3>
 <div id="itineraryList"></div>
+
 </div>
 
 <div class="section">
+
 <button onclick="window.print()">Print / Save PDF</button>
+
 </div>
 
 <script>
 
-let optionCount=0;
+/* DATABASE */
 
 let hotels = JSON.parse(localStorage.getItem("hotelDB")||"[]");
 let tours = JSON.parse(localStorage.getItem("tourDB")||"[]");
 
-function addOption(){
+let optionCount=0;
+
+/* CREATE HOTEL OPTION */
+
+function addOption(cityCount){
 
 optionCount++;
+
+let hideSecond = cityCount<=1 ? "style='display:none'" : "";
 
 let div=document.createElement("div");
 
@@ -207,11 +259,13 @@ div.innerHTML=`
 Package Cost
 <input id="priceOption${optionCount}">
 
-City 1
+City
 <input id="city${optionCount}_1">
 
-Hotel 1
+Hotel
 <input id="hotel${optionCount}_1" list="hotelSuggestions">
+
+<div ${hideSecond} id="cityBlock${optionCount}">
 
 City 2
 <input id="city${optionCount}_2">
@@ -219,11 +273,15 @@ City 2
 Hotel 2
 <input id="hotel${optionCount}_2" list="hotelSuggestions">
 
+</div>
+
 `;
 
 document.getElementById("optionsArea").appendChild(div);
 
 }
+
+/* SAVE HOTEL */
 
 function saveHotel(){
 
@@ -238,6 +296,8 @@ renderHotels();
 
 }
 
+/* AUTO SAVE HOTEL */
+
 function autoSaveHotel(city,name){
 
 if(!name) return;
@@ -247,6 +307,7 @@ let exists=hotels.some(h=>h.name===name);
 if(!exists){
 
 hotels.push({city,name});
+
 localStorage.setItem("hotelDB",JSON.stringify(hotels));
 
 renderHotels();
@@ -255,9 +316,12 @@ renderHotels();
 
 }
 
+/* RENDER HOTEL DATABASE */
+
 function renderHotels(){
 
 let list=document.getElementById("hotelList");
+
 list.innerHTML="";
 
 let dataList=document.getElementById("hotelSuggestions");
@@ -266,6 +330,7 @@ if(!dataList){
 
 dataList=document.createElement("datalist");
 dataList.id="hotelSuggestions";
+
 document.body.appendChild(dataList);
 
 }
@@ -276,15 +341,19 @@ hotels.forEach(h=>{
 
 let li=document.createElement("li");
 li.innerText=h.city+" – "+h.name;
+
 list.appendChild(li);
 
 let opt=document.createElement("option");
 opt.value=h.name;
+
 dataList.appendChild(opt);
 
 });
 
 }
+
+/* SAVE TOUR */
 
 function saveTour(){
 
@@ -298,31 +367,38 @@ renderTours();
 
 }
 
+/* RENDER TOUR */
+
 function renderTours(){
 
 let list=document.getElementById("tourList");
+
 list.innerHTML="";
 
 tours.forEach(t=>{
 
 let li=document.createElement("li");
+
 li.innerText=t;
+
 list.appendChild(li);
 
 });
 
 }
 
+/* LIST BUILDER */
+
 function createList(container,data){
 
-if(!data) return;
-
-let arr = Array.isArray(data) ? data : data.split("\n");
+if(!data || data.length===0) return;
 
 let html="<ul>";
 
-arr.forEach(item=>{
-if(item && item.trim()) html+="<li>"+item+"</li>";
+data.forEach(item=>{
+
+html+="<li>"+item+"</li>";
+
 });
 
 html+="</ul>";
@@ -331,21 +407,53 @@ container.innerHTML=html;
 
 }
 
+/* ITINERARY BUILDER */
+
 function buildItinerary(container,data){
 
-if(!data) return;
+if(!data || data.length===0){
+
+data=[
+"Arrival and hotel check-in",
+"Local sightseeing or leisure day",
+"Explore major attractions",
+"Optional tours or activities",
+"Leisure or shopping",
+"Departure transfer"
+];
+
+}
 
 let html="";
 
-let arr = Array.isArray(data) ? data : data.split("\n");
+data.forEach((item,i)=>{
 
-arr.forEach((item,i)=>{
 html+=`<p><span class='itDay'>Day ${i+1}</span> – ${item}</p>`;
+
 });
 
 container.innerHTML=html;
 
 }
+
+/* DEFAULT EXCLUSIONS */
+
+function defaultExclusions(){
+
+return [
+
+"Airfare unless specified",
+"Personal expenses",
+"Travel insurance",
+"Tips and porterage",
+"Early check-in / late checkout",
+"Anything not mentioned in inclusions"
+
+];
+
+}
+
+/* RUN AI */
 
 async function runAI(){
 
@@ -358,25 +466,16 @@ Extract travel quotation details.
 Return JSON:
 
 {
-"destination":"",
-"arrival_city":"",
-"departure_city":"",
-"travel_date":"",
-"duration":"",
-"adults":0,
-"children":0,
-"options":[
-{
-"price":"",
-"cities":[
-{"city":"","hotel":""},
-{"city":"","hotel":""}
-]
-}
-],
-"inclusions":[],
-"exclusions":[],
-"itinerary":[]
+destination:"",
+arrival_city:"",
+departure_city:"",
+duration:"",
+adults:0,
+children:0,
+options:[{price:"",cities:[{city:"",hotel:""}]}],
+inclusions:[],
+exclusions:[],
+itinerary:[]
 }
 
 Text:
@@ -409,59 +508,39 @@ let data=await response.json();
 
 let aiText=data.choices[0].message.content;
 
-console.log("AI RAW RESPONSE:", aiText);
+aiText=aiText.replace(/```json|```/g,"").trim();
 
-aiText = aiText.replace(/```json/g,"")
-               .replace(/```/g,"")
-               .trim();
-
-let result={};
-
-try{
-result=JSON.parse(aiText);
-}catch(e){
-console.log("JSON parse error:",e);
-alert("AI response format error. Check console.");
-return;
-}
-
-console.log("PARSED RESULT:",result);
+let result=JSON.parse(aiText);
 
 fillForm(result);
 
 }
 
+/* FILL FORM */
+
 function fillForm(result){
 
-if(result.destination)
-document.getElementById("destination").value=result.destination;
+document.getElementById("destination").value=result.destination||"";
 
-if(result.arrival_city)
-document.getElementById("arrivalCity").value=result.arrival_city;
+document.getElementById("arrivalCity").value=result.arrival_city||"";
 
-if(result.departure_city)
-document.getElementById("departureCity").value=result.departure_city;
+document.getElementById("departureCity").value=result.departure_city||"";
 
-if(result.travel_date)
-document.getElementById("travelDate").value=result.travel_date;
+document.getElementById("duration").value=result.duration||"";
 
-if(result.duration)
-document.getElementById("duration").value=result.duration;
+document.getElementById("adults").value=result.adults||"";
 
-if(result.adults)
-document.getElementById("adults").value=result.adults;
-
-if(result.children)
-document.getElementById("children").value=result.children;
+document.getElementById("children").value=result.children||"";
 
 document.getElementById("optionsArea").innerHTML="";
+
 optionCount=0;
 
-if(result.options){
+let cityCount=result.options?.[0]?.cities?.length || 1;
 
 result.options.forEach((opt,i)=>{
 
-addOption();
+addOption(cityCount);
 
 let index=i+1;
 
@@ -470,6 +549,7 @@ document.getElementById("priceOption"+index).value=opt.price||"";
 if(opt.cities[0]){
 
 document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
+
 document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
 
 autoSaveHotel(opt.cities[0].city,opt.cities[0].hotel);
@@ -479,6 +559,7 @@ autoSaveHotel(opt.cities[0].city,opt.cities[0].hotel);
 if(opt.cities[1]){
 
 document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
+
 document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
 
 autoSaveHotel(opt.cities[1].city,opt.cities[1].hotel);
@@ -487,25 +568,34 @@ autoSaveHotel(opt.cities[1].city,opt.cities[1].hotel);
 
 });
 
-}
-
 createList(document.getElementById("inclusionsList"),result.inclusions);
-createList(document.getElementById("exclusionsList"),result.exclusions);
+
+let exclusions=result.exclusions?.length?result.exclusions:defaultExclusions();
+
+createList(document.getElementById("exclusionsList"),exclusions);
+
 buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 
 }
 
+/* PAGE LOAD */
+
 window.onload=function(){
 
 renderHotels();
+
 renderTours();
-addOption();
+
+addOption(1);
 
 let today=new Date().toISOString().split('T')[0];
+
 document.getElementById("createDate").value=today;
 
 let last=localStorage.getItem("quoteNo")||0;
+
 last=parseInt(last)+1;
+
 localStorage.setItem("quoteNo",last);
 
 document.getElementById("quoteNo").value="TP-"+new Date().getFullYear()+"-"+String(last).padStart(3,"0");
