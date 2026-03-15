@@ -409,16 +409,23 @@ let data=await response.json();
 
 let aiText=data.choices[0].message.content;
 
-aiText=aiText.replace(/```json|```/g,"").trim();
+console.log("AI RAW RESPONSE:", aiText);
+
+aiText = aiText.replace(/```json/g,"")
+               .replace(/```/g,"")
+               .trim();
 
 let result={};
 
 try{
 result=JSON.parse(aiText);
 }catch(e){
-alert("AI response format error");
+console.log("JSON parse error:",e);
+alert("AI response format error. Check console.");
 return;
 }
+
+console.log("PARSED RESULT:",result);
 
 fillForm(result);
 
