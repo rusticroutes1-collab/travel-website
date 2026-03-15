@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Travel Proposal</title>
+<title>Travel Proposal CRM</title>
 
 <style>
 
@@ -18,7 +18,7 @@ margin:20px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-background:#1f3c88;
+background:#0b8f4c;
 color:white;
 padding:15px;
 border-radius:8px;
@@ -51,7 +51,7 @@ margin-top:5px;
 }
 
 button{
-background:#1f6feb;
+background:#0b8f4c;
 color:white;
 padding:10px 15px;
 border:none;
@@ -62,7 +62,7 @@ margin-top:10px;
 
 .itDay{
 font-weight:bold;
-color:#1f3c88;
+color:#0b8f4c;
 }
 
 /* PRINT */
@@ -72,6 +72,9 @@ color:#1f3c88;
 #inputSection{display:none}
 #hotelDBSection{display:none}
 #tourDBSection{display:none}
+#templateSection{display:none}
+#historySection{display:none}
+
 button{display:none}
 
 body{background:white;}
@@ -87,16 +90,14 @@ body{background:white;}
 
 <h1>Travel Proposal</h1>
 
-<img src="logo.png" class="logo">
-
 </div>
 
-<!-- ROUGH INPUT -->
+<!-- INPUT -->
 
 <div class="section" id="inputSection">
 
 <label>Paste Rough Quotation</label>
-<textarea id="roughQuote" rows="8"></textarea>
+<textarea id="roughQuote" rows="6"></textarea>
 
 <label>OpenAI API Key</label>
 <input id="apiKey">
@@ -167,6 +168,30 @@ Create Date
 
 </div>
 
+<!-- TEMPLATE LIBRARY -->
+
+<div class="section" id="templateSection">
+
+<h3>Template Library</h3>
+
+<input id="templateSearch" placeholder="Search destination / city / nights" onkeyup="searchTemplate()">
+
+<ul id="templateList"></ul>
+
+<button onclick="saveTemplate()">Save Current As Template</button>
+
+</div>
+
+<!-- HISTORY -->
+
+<div class="section" id="historySection">
+
+<h3>Quotation History</h3>
+
+<ul id="historyList"></ul>
+
+</div>
+
 <!-- HOTEL DATABASE -->
 
 <div class="section" id="hotelDBSection">
@@ -182,21 +207,6 @@ Hotel
 <button onclick="saveHotel()">Save Hotel</button>
 
 <ul id="hotelList"></ul>
-
-</div>
-
-<!-- TOUR DATABASE -->
-
-<div class="section" id="tourDBSection">
-
-<h3>Tour Database</h3>
-
-Tour
-<input id="tourName">
-
-<button onclick="saveTour()">Save Tour</button>
-
-<ul id="tourList"></ul>
 
 </div>
 
@@ -238,11 +248,12 @@ Tour
 /* DATABASE */
 
 let hotels = JSON.parse(localStorage.getItem("hotelDB")||"[]");
-let tours = JSON.parse(localStorage.getItem("tourDB")||"[]");
+let templates = JSON.parse(localStorage.getItem("templateDB")||"[]");
+let historyDB = JSON.parse(localStorage.getItem("historyDB")||"[]");
 
 let optionCount=0;
 
-/* CREATE HOTEL OPTION */
+/* HOTEL OPTION */
 
 function addOption(cityCount){
 
@@ -263,15 +274,15 @@ City
 <input id="city${optionCount}_1">
 
 Hotel
-<input id="hotel${optionCount}_1" list="hotelSuggestions">
+<input id="hotel${optionCount}_1">
 
-<div ${hideSecond} id="cityBlock${optionCount}">
+<div ${hideSecond}>
 
 City 2
 <input id="city${optionCount}_2">
 
 Hotel 2
-<input id="hotel${optionCount}_2" list="hotelSuggestions">
+<input id="hotel${optionCount}_2">
 
 </div>
 
@@ -281,7 +292,7 @@ document.getElementById("optionsArea").appendChild(div);
 
 }
 
-/* SAVE HOTEL */
+/* HOTEL DB */
 
 function saveHotel(){
 
@@ -296,90 +307,70 @@ renderHotels();
 
 }
 
-/* AUTO SAVE HOTEL */
-
-function autoSaveHotel(city,name){
-
-if(!name) return;
-
-let exists=hotels.some(h=>h.name===name);
-
-if(!exists){
-
-hotels.push({city,name});
-
-localStorage.setItem("hotelDB",JSON.stringify(hotels));
-
-renderHotels();
-
-}
-
-}
-
-/* RENDER HOTEL DATABASE */
-
 function renderHotels(){
 
 let list=document.getElementById("hotelList");
 
 list.innerHTML="";
 
-let dataList=document.getElementById("hotelSuggestions");
-
-if(!dataList){
-
-dataList=document.createElement("datalist");
-dataList.id="hotelSuggestions";
-
-document.body.appendChild(dataList);
-
-}
-
-dataList.innerHTML="";
-
 hotels.forEach(h=>{
 
 let li=document.createElement("li");
+
 li.innerText=h.city+" – "+h.name;
 
 list.appendChild(li);
 
-let opt=document.createElement("option");
-opt.value=h.name;
-
-dataList.appendChild(opt);
-
 });
 
 }
 
-/* SAVE TOUR */
+/* TEMPLATE */
 
-function saveTour(){
+function saveTemplate(){
 
-let name=document.getElementById("tourName").value;
+let template={
 
-tours.push(name);
+name:document.getElementById("destination").value+" "+document.getElementById("duration").value,
 
-localStorage.setItem("tourDB",JSON.stringify(tours));
+destination:document.getElementById("destination").value,
+duration:document.getElementById("duration").value,
+inclusions:document.getElementById("inclusionsList").innerHTML,
+exclusions:document.getElementById("exclusionsList").innerHTML,
+itinerary:document.getElementById("itineraryList").innerHTML
 
-renderTours();
+};
+
+templates.push(template);
+
+localStorage.setItem("templateDB",JSON.stringify(templates));
+
+renderTemplates();
 
 }
 
-/* RENDER TOUR */
+function renderTemplates(){
 
-function renderTours(){
-
-let list=document.getElementById("tourList");
+let list=document.getElementById("templateList");
 
 list.innerHTML="";
 
-tours.forEach(t=>{
+templates.forEach((t,i)=>{
 
 let li=document.createElement("li");
 
-li.innerText=t;
+li.innerText=t.name;
+
+li.onclick=function(){
+
+document.getElementById("destination").value=t.destination;
+document.getElementById("duration").value=t.duration;
+
+document.getElementById("inclusionsList").innerHTML=t.inclusions;
+document.getElementById("exclusionsList").innerHTML=t.exclusions;
+document.getElementById("itineraryList").innerHTML=t.itinerary;
+
+};
 
 list.appendChild(li);
 
@@ -387,194 +378,55 @@ list.appendChild(li);
 
 }
 
-/* LIST BUILDER */
+function searchTemplate(){
 
-function createList(container,data){
+let key=document.getElementById("templateSearch").value.toLowerCase();
 
-if(!data || data.length===0) return;
+let list=document.getElementById("templateList");
 
-let html="<ul>";
+list.innerHTML="";
 
-data.forEach(item=>{
+templates.filter(t=>t.name.toLowerCase().includes(key)).forEach(t=>{
 
-html+="<li>"+item+"</li>";
+let li=document.createElement("li");
 
-});
+li.innerText=t.name;
 
-html+="</ul>";
-
-container.innerHTML=html;
-
-}
-
-/* ITINERARY BUILDER */
-
-function buildItinerary(container,data){
-
-if(!data || data.length===0){
-
-data=[
-"Arrival and hotel check-in",
-"Local sightseeing or leisure day",
-"Explore major attractions",
-"Optional tours or activities",
-"Leisure or shopping",
-"Departure transfer"
-];
-
-}
-
-let html="";
-
-data.forEach((item,i)=>{
-
-html+=`<p><span class='itDay'>Day ${i+1}</span> – ${item}</p>`;
+list.appendChild(li);
 
 });
 
-container.innerHTML=html;
+}
+
+/* HISTORY */
+
+function saveHistory(){
+
+let item=document.getElementById("quoteNo").value+" "+document.getElementById("destination").value;
+
+historyDB.push(item);
+
+localStorage.setItem("historyDB",JSON.stringify(historyDB));
+
+renderHistory();
 
 }
 
-/* DEFAULT EXCLUSIONS */
+function renderHistory(){
 
-function defaultExclusions(){
+let list=document.getElementById("historyList");
 
-return [
+list.innerHTML="";
 
-"Airfare unless specified",
-"Personal expenses",
-"Travel insurance",
-"Tips and porterage",
-"Early check-in / late checkout",
-"Anything not mentioned in inclusions"
+historyDB.forEach(h=>{
 
-];
+let li=document.createElement("li");
 
-}
+li.innerText=h;
 
-/* RUN AI */
-
-async function runAI(){
-
-let text=document.getElementById("roughQuote").value;
-let apiKey=document.getElementById("apiKey").value;
-
-let prompt=`
-Extract travel quotation details.
-
-Return JSON:
-
-{
-destination:"",
-arrival_city:"",
-departure_city:"",
-duration:"",
-adults:0,
-children:0,
-options:[{price:"",cities:[{city:"",hotel:""}]}],
-inclusions:[],
-exclusions:[],
-itinerary:[]
-}
-
-Text:
-${text}
-`;
-
-let response=await fetch("https://api.openai.com/v1/chat/completions",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"Authorization":"Bearer "+apiKey
-},
-
-body:JSON.stringify({
-
-model:"gpt-4o-mini",
-
-messages:[
-{role:"system",content:"Extract travel quotation"},
-{role:"user",content:prompt}
-]
-
-})
+list.appendChild(li);
 
 });
-
-let data=await response.json();
-
-let aiText=data.choices[0].message.content;
-
-aiText=aiText.replace(/```json|```/g,"").trim();
-
-let result=JSON.parse(aiText);
-
-fillForm(result);
-
-}
-
-/* FILL FORM */
-
-function fillForm(result){
-
-document.getElementById("destination").value=result.destination||"";
-
-document.getElementById("arrivalCity").value=result.arrival_city||"";
-
-document.getElementById("departureCity").value=result.departure_city||"";
-
-document.getElementById("duration").value=result.duration||"";
-
-document.getElementById("adults").value=result.adults||"";
-
-document.getElementById("children").value=result.children||"";
-
-document.getElementById("optionsArea").innerHTML="";
-
-optionCount=0;
-
-let cityCount=result.options?.[0]?.cities?.length || 1;
-
-result.options.forEach((opt,i)=>{
-
-addOption(cityCount);
-
-let index=i+1;
-
-document.getElementById("priceOption"+index).value=opt.price||"";
-
-if(opt.cities[0]){
-
-document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
-
-document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
-
-autoSaveHotel(opt.cities[0].city,opt.cities[0].hotel);
-
-}
-
-if(opt.cities[1]){
-
-document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
-
-document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
-
-autoSaveHotel(opt.cities[1].city,opt.cities[1].hotel);
-
-}
-
-});
-
-createList(document.getElementById("inclusionsList"),result.inclusions);
-
-let exclusions=result.exclusions?.length?result.exclusions:defaultExclusions();
-
-createList(document.getElementById("exclusionsList"),exclusions);
-
-buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 
 }
 
@@ -583,8 +435,8 @@ buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 window.onload=function(){
 
 renderHotels();
-
-renderTours();
+renderTemplates();
+renderHistory();
 
 addOption(1);
 
