@@ -153,17 +153,27 @@ messages:[
 })
 });
 
-let data=await response.json();
+let data = await response.json();
 
 console.log(data);
 
-let aiText=data.choices[0].message.content;
+let aiText = data.choices[0].message.content;
+
+// remove markdown
 aiText = aiText.replace(/```json|```/g,"").trim();
 
-let result={};
+// extract JSON only
+let start = aiText.indexOf("{");
+let end = aiText.lastIndexOf("}");
+
+if(start !== -1 && end !== -1){
+aiText = aiText.substring(start,end+1);
+}
+
+let result = {};
 
 try{
-result=JSON.parse(aiText);
+result = JSON.parse(aiText);
 }catch(e){
 console.error("JSON parse error",e);
 alert("AI response format error");
@@ -173,7 +183,6 @@ return;
 console.log(result);
 
 fillForm(result);
-
 }
 
 function fillForm(result){
