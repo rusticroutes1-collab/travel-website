@@ -75,9 +75,13 @@ button{display:none}
 <body>
 
 <div class="header">
+
 <div></div>
+
 <h1>Travel Quotation</h1>
+
 <img src="logo.png" class="logo">
+
 </div>
 
 <div class="section" id="inputSection">
@@ -89,6 +93,36 @@ button{display:none}
 <input id="apiKey">
 
 <button onclick="runAI()">Generate Proposal</button>
+
+</div>
+
+<div class="section">
+
+<h3>Client Details</h3>
+
+<div class="grid">
+
+<div>
+Client Name
+<input id="clientName">
+</div>
+
+<div>
+Contact
+<input id="clientContact">
+</div>
+
+<div>
+Proposal No
+<input id="quoteNo" readonly>
+</div>
+
+<div>
+Create Date
+<input id="createDate" type="date">
+</div>
+
+</div>
 
 </div>
 
@@ -113,6 +147,7 @@ button{display:none}
 <div class="section">
 
 <h3>Hotel Options</h3>
+
 <div id="optionsArea"></div>
 
 </div>
@@ -177,8 +212,44 @@ Tour
 
 <script>
 
+let optionCount=0;
 let hotels = JSON.parse(localStorage.getItem("hotelDB")||"[]");
 let tours = JSON.parse(localStorage.getItem("tourDB")||"[]");
+
+/* HOTEL OPTION CREATOR */
+
+function addOption(){
+
+optionCount++;
+
+let div=document.createElement("div");
+
+div.className="section";
+
+div.innerHTML=`
+<h4>Option ${optionCount}</h4>
+
+Package Cost
+<input id="priceOption${optionCount}">
+
+City 1
+<input id="city${optionCount}_1">
+
+Hotel 1
+<input id="hotel${optionCount}_1">
+
+City 2
+<input id="city${optionCount}_2">
+
+Hotel 2
+<input id="hotel${optionCount}_2">
+`;
+
+document.getElementById("optionsArea").appendChild(div);
+
+}
+
+/* HOTEL DATABASE */
 
 function saveHotel(){
 
@@ -196,19 +267,19 @@ renderHotels();
 function renderHotels(){
 
 let list=document.getElementById("hotelList");
-
 list.innerHTML="";
 
 hotels.forEach(h=>{
 
 let li=document.createElement("li");
 li.innerText=h.city+" – "+h.name;
-
 list.appendChild(li);
 
 });
 
 }
+
+/* TOUR DATABASE */
 
 function saveTour(){
 
@@ -225,22 +296,19 @@ renderTours();
 function renderTours(){
 
 let list=document.getElementById("tourList");
-
 list.innerHTML="";
 
 tours.forEach(t=>{
 
 let li=document.createElement("li");
 li.innerText=t;
-
 list.appendChild(li);
 
 });
 
 }
 
-renderHotels();
-renderTours();
+/* LIST BUILDER */
 
 function createList(container,data){
 
@@ -260,6 +328,8 @@ container.innerHTML=html;
 
 }
 
+/* ITINERARY BUILDER */
+
 function buildItinerary(container,data){
 
 if(!data) return;
@@ -276,17 +346,17 @@ container.innerHTML=html;
 
 }
 
+/* AI PARSER */
+
 async function runAI(){
 
 let text=document.getElementById("roughQuote").value;
 let apiKey=document.getElementById("apiKey").value;
 
-let prompt = `
-You are a travel quotation parser.
+let prompt=`
+Extract travel quotation details including hotel options and package cost.
 
-Extract the following details from the text.
-
-Return ONLY valid JSON in this structure:
+Return JSON:
 
 {
 "destination":"",
@@ -310,16 +380,10 @@ Return ONLY valid JSON in this structure:
 "itinerary":[]
 }
 
-Important rules:
-- Detect hotel options like "Option 1", "Option 2"
-- Detect package cost like "Package Cost", "THB", "INR", "per pax"
-- Detect cities from hotel names if possible
-- Convert itinerary lines like "Day 1:" into itinerary list
-- Return clean JSON only.
-
 Text:
 ${text}
 `;
+
 let response=await fetch("https://api.openai.com/v1/chat/completions",{
 
 method:"POST",
@@ -353,45 +417,16 @@ let result={};
 try{
 result=JSON.parse(aiText);
 }catch(e){
-console.log(aiText);
 alert("AI response format error");
 return;
 }
+
 fillForm(result);
 
 }
-let optionCount = 0;
 
-function addOption(){
+/* FILL FORM */
 
-optionCount++;
-
-let div = document.createElement("div");
-
-div.className = "section";
-
-div.innerHTML = `
-<h4>Option ${optionCount}</h4>
-
-<label>Package Cost</label>
-<input id="priceOption${optionCount}">
-
-<label>City 1</label>
-<input id="city${optionCount}_1">
-
-<label>Hotel 1</label>
-<input id="hotel${optionCount}_1">
-
-<label>City 2</label>
-<input id="city${optionCount}_2">
-
-<label>Hotel 2</label>
-<input id="hotel${optionCount}_2">
-`;
-
-document.getElementById("optionsArea").appendChild(div);
-
-}
 function fillForm(result){
 
 if(result.destination)
@@ -415,12 +450,8 @@ document.getElementById("adults").value=result.adults;
 if(result.children)
 document.getElementById("children").value=result.children;
 
-/* CLEAR OLD OPTIONS */
-
 document.getElementById("optionsArea").innerHTML="";
 optionCount=0;
-
-/* CREATE HOTEL OPTIONS */
 
 if(result.options){
 
@@ -430,30 +461,19 @@ addOption();
 
 let index=i+1;
 
-if(opt.price)
-document.getElementById("priceOption"+index).value=opt.price;
+document.getElementById("priceOption"+index).value=opt.price||"";
 
-/* FIRST CITY */
+if(opt.cities[0]){
 
-if(opt.cities && opt.cities[0]){
-
-document.getElementById("city"+index+"_1").value=
-opt.cities[0].city || "";
-
-document.getElementById("hotel"+index+"_1").value=
-opt.cities[0].hotel || "";
+document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
+document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
 
 }
 
-/* SECOND CITY */
+if(opt.cities[1]){
 
-if(opt.cities && opt.cities[1]){
-
-document.getElementById("city"+index+"_2").value=
-opt.cities[1].city || "";
-
-document.getElementById("hotel"+index+"_2").value=
-opt.cities[1].hotel || "";
+document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
+document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
 
 }
 
@@ -461,35 +481,31 @@ opt.cities[1].hotel || "";
 
 }
 
-/* INCLUSIONS */
-
-createList(
-document.getElementById("inclusionsList"),
-result.inclusions
-);
-
-/* EXCLUSIONS */
-
-createList(
-document.getElementById("exclusionsList"),
-result.exclusions
-);
-
-/* ITINERARY */
-
-buildItinerary(
-document.getElementById("itineraryList"),
-result.itinerary
-);
+createList(document.getElementById("inclusionsList"),result.inclusions);
+createList(document.getElementById("exclusionsList"),result.exclusions);
+buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 
 }
-window.onload = function(){
+
+/* INITIAL PAGE LOAD */
+
+window.onload=function(){
 
 renderHotels();
 renderTours();
 addOption();
 
+let today=new Date().toISOString().split('T')[0];
+document.getElementById("createDate").value=today;
+
+let last=localStorage.getItem("quoteNo")||0;
+last=parseInt(last)+1;
+localStorage.setItem("quoteNo",last);
+
+document.getElementById("quoteNo").value="TP-"+new Date().getFullYear()+"-"+String(last).padStart(3,"0");
+
 }
+
 </script>
 
 </body>
