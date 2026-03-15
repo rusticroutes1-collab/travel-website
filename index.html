@@ -273,8 +273,6 @@ localStorage.setItem("hotelMemory",JSON.stringify(hotels));
 
 loadHotelMemory();
 
-
-
 /* HOTEL OPTIONS */
 let optionCount=0;
 
@@ -284,9 +282,7 @@ optionCount++;
 let div=document.createElement("div");
 
 div.className="section";
-
 div.id="option"+optionCount;
-
 
 div.innerHTML=`
 <h4>Option ${optionCount}</h4>
@@ -295,6 +291,7 @@ Price
 
 City
 <input id="city${optionCount}_1">
+
 Hotel
 <input id="hotel${optionCount}_1" list="hotelMemory">
 
