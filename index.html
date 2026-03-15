@@ -118,6 +118,26 @@ margin-bottom:20px
 <button onclick="addOption()">Add Hotel Option</button>
 </div>
 
+<!-- HOTEL DATABASE -->
+<div class="section" id="hotelDatabaseSection">
+<h3>Hotel Database</h3>
+<div class="grid">
+<div>
+<label>City</label>
+<input id="hotelCityInput" placeholder="e.g. Pattaya">
+</div>
+<div>
+<label>Hotel Name</label>
+<input id="hotelNameInput" placeholder="e.g. Bella Express Pattaya">
+</div>
+</div>
+<button onclick="addHotelToDatabase()">Save Hotel</button>
+
+<label style="margin-top:10px">Search Hotels by City</label>
+<input id="hotelCitySearch" placeholder="Type city name" oninput="filterHotelsByCity()">
+<div id="hotelSearchResults"></div>
+</div>
+
 <datalist id="hotelMemory"></datalist>
 
 <div class="section">
@@ -170,18 +190,60 @@ list.innerHTML="";
 
 hotels.forEach(h=>{
 let opt=document.createElement("option");
-opt.value=h;
+opt.value=h.name;
 list.appendChild(opt);
 });
 }
 
-function rememberHotel(name){
-if(!name) return;
+function addHotelToDatabase(){
+let city=document.getElementById("hotelCityInput").value.trim();
+let name=document.getElementById("hotelNameInput").value.trim();
+
+if(!city || !name) return;
+
 let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
 
-if(!hotels.includes(name)){
-hotels.push(name);
+hotels.push({city:city,name:name});
+
 localStorage.setItem("hotelMemory",JSON.stringify(hotels));
+
+loadHotelMemory();
+
+alert("Hotel saved to database");
+}
+
+function filterHotelsByCity(){
+let city=document.getElementById("hotelCitySearch").value.toLowerCase();
+let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
+
+let results=hotels.filter(h=>h.city.toLowerCase().includes(city));
+
+let html="<ul>";
+
+results.forEach(h=>{
+html+=`<li>${h.city} – ${h.name}</li>`;
+});
+
+html+="</ul>";
+
+if(results.length===0) html="<p>No hotels found</p>";
+
+document.getElementById("hotelSearchResults").innerHTML=html;
+}
+
+function rememberHotel(name){
+if(!name) return;
+
+let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
+
+let exists=hotels.some(h=>h.name===name);
+
+if(!exists){
+hotels.push({city:"",name:name});
+localStorage.setItem("hotelMemory",JSON.stringify(hotels));
+}
+
+loadHotelMemory();
 }
 
 loadHotelMemory();
