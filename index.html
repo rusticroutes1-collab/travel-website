@@ -11,13 +11,22 @@ textarea,input{width:100%;padding:8px;margin:6px 0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 button{padding:10px 14px;margin-top:10px;border:none;background:#0077cc;color:white;border-radius:4px;cursor:pointer}
 button:hover{background:#005fa3}
+
+/* PRINT SETTINGS */
+@media print{
+#inputSection{display:none}
+button{display:none}
+textarea,input{border:none}
+}
+
+ul{margin:5px 0 0 18px}
 </style>
 </head>
 <body>
 
 <h2>AI Travel Quotation Generator</h2>
 
-<div class="section">
+<div class="section" id="inputSection">
 <label>Paste Rough Quotation / WhatsApp Text</label>
 <textarea id="roughQuote" rows="8" placeholder="Paste travel text here..."></textarea>
 
@@ -95,15 +104,18 @@ button:hover{background:#005fa3}
 
 <div class="section">
 <h3>Inclusions</h3>
-<textarea id="inclusions" rows="4"></textarea>
+<div id="inclusionsList"></div>
+<textarea id="inclusions" rows="4" style="display:none"></textarea>
 
 <h3>Exclusions</h3>
-<textarea id="exclusions" rows="4"></textarea>
+<div id="exclusionsList"></div>
+<textarea id="exclusions" rows="4" style="display:none"></textarea>
 </div>
 
 <div class="section">
-<h3>Itinerary</h3>
-<textarea id="itinerary" rows="8"></textarea>
+<h3>Day Wise Itinerary</h3>
+<div id="itineraryList"></div>
+<textarea id="itinerary" rows="8" style="display:none"></textarea>
 </div>
 
 <div class="section">
@@ -112,14 +124,19 @@ button:hover{background:#005fa3}
 
 <script>
 
+/* SAVE API KEY */
+document.getElementById("apiKey").value = localStorage.getItem("openaiKey") || "";
+
 async function runAI(){
 
 let text=document.getElementById("roughQuote").value;
 let apiKey=document.getElementById("apiKey").value;
 
+localStorage.setItem("openaiKey",apiKey);
+
 let prompt=`Extract travel quotation details.
 
-Return JSON only.
+Return ONLY JSON.
 
 {
 "destination":"",
@@ -127,14 +144,15 @@ Return JSON only.
 "duration":"",
 "adults":0,
 "children":0,
-"cities":[
-{"city":"","hotel":"","nights":0}
-],
+"cities":[{"city":"","hotel":"","nights":0}],
 "price":"",
-"inclusions":"",
-"exclusions":"",
-"itinerary":""
+"inclusions":[],
+"exclusions":[],
+"itinerary":[]
 }
+
+If exclusions are not mentioned generate standard travel exclusions.
+If itinerary missing create simple day wise itinerary.
 
 Text:\n${text}`;
 
@@ -147,22 +165,18 @@ headers:{
 body:JSON.stringify({
 model:"gpt-4o-mini",
 messages:[
-{role:"system",content:"Extract travel quotation details"},
+{role:"system",content:"Extract structured travel quotation data"},
 {role:"user",content:prompt}
 ]
 })
 });
 
-let data = await response.json();
+let data=await response.json();
 
-console.log(data);
+let aiText=data.choices[0].message.content;
 
-let aiText = data.choices[0].message.content;
-
-// remove markdown
 aiText = aiText.replace(/```json|```/g,"").trim();
 
-// extract JSON only
 let start = aiText.indexOf("{");
 let end = aiText.lastIndexOf("}");
 
@@ -170,19 +184,36 @@ if(start !== -1 && end !== -1){
 aiText = aiText.substring(start,end+1);
 }
 
-let result = {};
+let result={};
 
 try{
-result = JSON.parse(aiText);
+result=JSON.parse(aiText);
 }catch(e){
 console.error("JSON parse error",e);
 alert("AI response format error");
 return;
 }
 
-console.log(result);
-
 fillForm(result);
+
+}
+
+function createList(container,data){
+
+if(!data) return;
+
+let arr = Array.isArray(data) ? data : data.split("\n");
+
+let html="<ul>";
+
+arr.forEach(item=>{
+if(item && item.trim()) html+="<li>"+item+"</li>";
+});
+
+html+="</ul>";
+
+container.innerHTML=html;
+
 }
 
 function fillForm(result){
@@ -220,15 +251,9 @@ if(nightsField) nightsField.value=result.cities[i].nights || "";
 }
 }
 
-if(result.inclusions)
-document.getElementById("inclusions").value=result.inclusions;
-
-if(result.exclusions)
-document.getElementById("exclusions").value=result.exclusions;
-
-if(result.itinerary)
-document.getElementById("itinerary").value=
-Array.isArray(result.itinerary)?result.itinerary.join("\n"):result.itinerary;
+createList(document.getElementById("inclusionsList"),result.inclusions);
+createList(document.getElementById("exclusionsList"),result.exclusions);
+createList(document.getElementById("itineraryList"),result.itinerary);
 
 }
 
