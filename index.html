@@ -342,24 +342,6 @@ Rules:
 Text:
 ${text}`;
 
-Return JSON only.
-
-{
-"destination":"",
-"travel_date":"",
-"duration":"",
-"adults":0,
-"children":0,
-"options":[{"price":"","cities":[{"city":"","hotel":""}]}],
-"inclusions":[],
-"exclusions":[],
-"itinerary":[]
-}
-
-If itinerary missing generate a simple day wise itinerary.
-If exclusions missing generate standard travel exclusions.
-
-Text:\n${text}`;
 
 let response=await fetch("https://api.openai.com/v1/chat/completions",{
 method:"POST",
