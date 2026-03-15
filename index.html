@@ -5,10 +5,11 @@
 <title>Travel Quotation</title>
 
 <style>
+
 body{
 font-family:Arial;
-margin:20px;
 background:#eef2f7;
+margin:20px;
 }
 
 .header{
@@ -19,12 +20,6 @@ background:#1f3c88;
 color:white;
 padding:15px;
 border-radius:8px;
-}
-
-.header h1{
-margin:0;
-text-align:center;
-flex:1;
 }
 
 .logo{
@@ -61,9 +56,7 @@ cursor:pointer;
 margin-top:10px;
 }
 
-ul{
-margin-left:20px;
-}
+ul{margin-left:20px;}
 
 .itDay{
 font-weight:bold;
@@ -71,10 +64,10 @@ color:#1f3c88;
 }
 
 @media print{
-#inputSection{display:none;}
-button{display:none;}
-body{background:white;}
+#inputSection{display:none}
+button{display:none}
 }
+
 </style>
 
 </head>
@@ -82,15 +75,19 @@ body{background:white;}
 <body>
 
 <div class="header">
+
 <div></div>
+
 <h1>Travel Quotation</h1>
+
 <img src="logo.png" class="logo">
+
 </div>
 
 <div class="section" id="inputSection">
 
 <label>Paste Rough Quotation</label>
-<textarea id="roughQuote" rows="6"></textarea>
+<textarea id="roughQuote" rows="8"></textarea>
 
 <label>OpenAI API Key</label>
 <input id="apiKey">
@@ -135,40 +132,13 @@ Create Date
 
 <div class="grid">
 
-<div>
-Destination
-<input id="destination">
-</div>
-
-<div>
-Arrival City
-<input id="arrivalCity">
-</div>
-
-<div>
-Departure City
-<input id="departureCity">
-</div>
-
-<div>
-Travel Date
-<input id="travelDate">
-</div>
-
-<div>
-Duration
-<input id="duration">
-</div>
-
-<div>
-Adults
-<input id="adults">
-</div>
-
-<div>
-Children
-<input id="children">
-</div>
+<div>Destination<input id="destination"></div>
+<div>Arrival City<input id="arrivalCity"></div>
+<div>Departure City<input id="departureCity"></div>
+<div>Travel Date<input id="travelDate"></div>
+<div>Duration<input id="duration"></div>
+<div>Adults<input id="adults"></div>
+<div>Children<input id="children"></div>
 
 </div>
 
@@ -179,8 +149,6 @@ Children
 <h3>Hotel Options</h3>
 
 <div id="optionsArea"></div>
-
-<button onclick="addOption()">Add Hotel Option</button>
 
 </div>
 
@@ -204,7 +172,7 @@ Children
 <div id="itineraryList"></div>
 
 <p style="font-size:12px;color:#666">
-* Itinerary subject to operational feasibility and local conditions.
+* Itinerary subject to operational feasibility.
 </p>
 
 </div>
@@ -235,13 +203,16 @@ City
 Hotel
 <input id="hotel${optionCount}_1">
 
+City
+<input id="city${optionCount}_2">
+
+Hotel
+<input id="hotel${optionCount}_2">
 `;
 
 document.getElementById("optionsArea").appendChild(div);
 
 }
-
-addOption();
 
 function createList(container,data){
 
@@ -271,13 +242,7 @@ let arr = Array.isArray(data) ? data : data.split("\n");
 
 arr.forEach((item,i)=>{
 
-let text=item;
-
-if(typeof item === 'object'){
-text = item.description || item.activity || item.text || JSON.stringify(item);
-}
-
-html += `<p><span class='itDay'>Day ${i+1}</span> – ${text}</p>`;
+html+=`<p><span class='itDay'>Day ${i+1}</span> – ${item}</p>`;
 
 });
 
@@ -290,10 +255,10 @@ async function runAI(){
 let text=document.getElementById("roughQuote").value;
 let apiKey=document.getElementById("apiKey").value;
 
-let prompt = `
-Extract travel quotation details.
+let prompt=`
+Extract travel quotation details including hotel options and package cost.
 
-Return JSON only.
+Return JSON:
 
 {
 "destination":"",
@@ -303,6 +268,15 @@ Return JSON only.
 "duration":"",
 "adults":0,
 "children":0,
+"options":[
+{
+"price":"",
+"cities":[
+{"city":"","hotel":""},
+{"city":"","hotel":""}
+]
+}
+],
 "inclusions":[],
 "exclusions":[],
 "itinerary":[]
@@ -312,7 +286,7 @@ Text:
 ${text}
 `;
 
-let response = await fetch("https://api.openai.com/v1/chat/completions",{
+let response=await fetch("https://api.openai.com/v1/chat/completions",{
 
 method:"POST",
 
@@ -326,7 +300,7 @@ body:JSON.stringify({
 model:"gpt-4o-mini",
 
 messages:[
-{role:"system",content:"Extract travel quotation data"},
+{role:"system",content:"Extract structured travel quotation"},
 {role:"user",content:prompt}
 ]
 
@@ -334,20 +308,13 @@ messages:[
 
 });
 
-let data = await response.json();
+let data=await response.json();
 
-let aiText = data.choices[0].message.content;
+let aiText=data.choices[0].message.content;
 
-aiText = aiText.replace(/```json|```/g,"").trim();
+aiText=aiText.replace(/```json|```/g,"").trim();
 
-let result={};
-
-try{
-result=JSON.parse(aiText);
-}catch(e){
-alert("AI response format error");
-return;
-}
+let result=JSON.parse(aiText);
 
 fillForm(result);
 
@@ -376,6 +343,34 @@ document.getElementById("adults").value=result.adults;
 if(result.children)
 document.getElementById("children").value=result.children;
 
+if(result.options){
+
+result.options.forEach((opt,i)=>{
+
+addOption();
+
+let index=i+1;
+
+document.getElementById("priceOption"+index).value=opt.price||"";
+
+if(opt.cities[0]){
+
+document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
+document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
+
+}
+
+if(opt.cities[1]){
+
+document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
+document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
+
+}
+
+});
+
+}
+
 createList(document.getElementById("inclusionsList"),result.inclusions);
 
 createList(document.getElementById("exclusionsList"),result.exclusions);
@@ -385,22 +380,24 @@ buildItinerary(document.getElementById("itineraryList"),result.itinerary);
 }
 
 function setToday(){
-let today = new Date().toISOString().split('T')[0];
-document.getElementById("createDate").value = today;
+
+let today=new Date().toISOString().split('T')[0];
+
+document.getElementById("createDate").value=today;
+
 }
 
 function generateQuoteNumber(){
 
-let last = localStorage.getItem("lastQuoteNumber") || 0;
+let last=localStorage.getItem("lastQuoteNumber")||0;
 
-last = parseInt(last) + 1;
+last=parseInt(last)+1;
 
-localStorage.setItem("lastQuoteNumber", last);
+localStorage.setItem("lastQuoteNumber",last);
 
-let year = new Date().getFullYear();
+let year=new Date().getFullYear();
 
-document.getElementById("quoteNo").value =
-"TP-"+year+"-"+String(last).padStart(3,"0");
+document.getElementById("quoteNo").value="TP-"+year+"-"+String(last).padStart(3,"0");
 
 }
 
@@ -409,7 +406,7 @@ window.onload=function(){
 setToday();
 generateQuoteNumber();
 
-};
+}
 
 </script>
 
