@@ -201,10 +201,12 @@ City
 Hotel
 <input id="hotel${optionCount}_1" list="hotelMemory">
 
+<div class="cityBlock2">
 City
 <input id="city${optionCount}_2">
 Hotel
 <input id="hotel${optionCount}_2" list="hotelMemory">
+</div>
 `;
 
 document.getElementById("optionsArea").appendChild(div);
@@ -304,6 +306,9 @@ container.innerHTML=html;
 
 function fillForm(result){
 
+/* hide extra city blocks by default */
+document.querySelectorAll('.cityBlock2').forEach(el=>el.style.display='none');
+
 if(result.destination)
 document.getElementById("destination").value=result.destination;
 
@@ -344,6 +349,10 @@ rememberHotel(c1.hotel);
 }
 
 if(opt.cities[1]){
+
+/* show second city block if exists */
+let block = document.getElementById("hotel"+index+"_2").closest('.cityBlock2');
+if(block) block.style.display='block';
 
 let c2=opt.cities[1];
 
