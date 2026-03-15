@@ -360,7 +360,38 @@ return;
 fillForm(result);
 
 }
+let optionCount = 0;
 
+function addOption(){
+
+optionCount++;
+
+let div = document.createElement("div");
+
+div.className = "section";
+
+div.innerHTML = `
+<h4>Option ${optionCount}</h4>
+
+<label>Package Cost</label>
+<input id="priceOption${optionCount}">
+
+<label>City 1</label>
+<input id="city${optionCount}_1">
+
+<label>Hotel 1</label>
+<input id="hotel${optionCount}_1">
+
+<label>City 2</label>
+<input id="city${optionCount}_2">
+
+<label>Hotel 2</label>
+<input id="hotel${optionCount}_2">
+`;
+
+document.getElementById("optionsArea").appendChild(div);
+
+}
 function fillForm(result){
 
 if(result.destination)
@@ -452,13 +483,10 @@ result.itinerary
 );
 
 }
-window.onload=function(){
+window.onload = function(){
 
 renderHotels();
 renderTours();
-
-/* create first hotel option automatically */
-
 addOption();
 
 }
