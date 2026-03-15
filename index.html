@@ -281,10 +281,12 @@ async function runAI(){
 let text=document.getElementById("roughQuote").value;
 let apiKey=document.getElementById("apiKey").value;
 
-let prompt=`
-Extract travel quotation details including hotel options.
+let prompt = `
+You are a travel quotation parser.
 
-Return JSON:
+Extract the following details from the text.
+
+Return ONLY valid JSON in this structure:
 
 {
 "destination":"",
@@ -308,10 +310,16 @@ Return JSON:
 "itinerary":[]
 }
 
+Important rules:
+- Detect hotel options like "Option 1", "Option 2"
+- Detect package cost like "Package Cost", "THB", "INR", "per pax"
+- Detect cities from hotel names if possible
+- Convert itinerary lines like "Day 1:" into itinerary list
+- Return clean JSON only.
+
 Text:
 ${text}
 `;
-
 let response=await fetch("https://api.openai.com/v1/chat/completions",{
 
 method:"POST",
@@ -340,8 +348,15 @@ let aiText=data.choices[0].message.content;
 
 aiText=aiText.replace(/```json|```/g,"").trim();
 
-let result=JSON.parse(aiText);
+let result={};
 
+try{
+result=JSON.parse(aiText);
+}catch(e){
+console.log(aiText);
+alert("AI response format error");
+return;
+}
 fillForm(result);
 
 }
@@ -437,7 +452,16 @@ result.itinerary
 );
 
 }
+window.onload=function(){
 
+renderHotels();
+renderTours();
+
+/* create first hotel option automatically */
+
+addOption();
+
+}
 </script>
 
 </body>
