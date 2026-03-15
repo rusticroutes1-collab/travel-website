@@ -12,8 +12,6 @@ background:#eef2f7;
 margin:20px;
 }
 
-/* HEADER */
-
 .header{
 display:flex;
 justify-content:space-between;
@@ -27,8 +25,6 @@ border-radius:8px;
 .logo{
 height:60px;
 }
-
-/* SECTION */
 
 .section{
 background:white;
@@ -65,15 +61,14 @@ font-weight:bold;
 color:#0b8f4c;
 }
 
-/* PRINT */
-
 @media print{
 
-#inputSection{display:none}
-#hotelDBSection{display:none}
-#tourDBSection{display:none}
-#templateSection{display:none}
-#historySection{display:none}
+#inputSection,
+#hotelDBSection,
+#templateSection,
+#historySection{
+display:none
+}
 
 button{display:none}
 
@@ -94,8 +89,6 @@ body{background:white;}
 
 </div>
 
-<!-- INPUT -->
-
 <div class="section" id="inputSection">
 
 <label>Paste Rough Quotation</label>
@@ -107,8 +100,6 @@ body{background:white;}
 <button onclick="runAI()">Generate Proposal</button>
 
 </div>
-
-<!-- CLIENT DETAILS -->
 
 <div class="section">
 
@@ -140,8 +131,6 @@ Create Date
 
 </div>
 
-<!-- TRIP DETAILS -->
-
 <div class="section">
 
 <h3>Trip Details</h3>
@@ -160,8 +149,6 @@ Create Date
 
 </div>
 
-<!-- HOTEL OPTIONS -->
-
 <div class="section">
 
 <h3>Hotel Options</h3>
@@ -170,21 +157,17 @@ Create Date
 
 </div>
 
-<!-- TEMPLATE LIBRARY -->
-
 <div class="section" id="templateSection">
 
 <h3>Template Library</h3>
 
-<input id="templateSearch" placeholder="Search destination / city / nights" onkeyup="searchTemplate()">
+<input id="templateSearch" placeholder="Search template" onkeyup="searchTemplate()">
 
 <ul id="templateList"></ul>
 
 <button onclick="saveTemplate()">Save Current As Template</button>
 
 </div>
-
-<!-- HISTORY -->
 
 <div class="section" id="historySection">
 
@@ -193,8 +176,6 @@ Create Date
 <ul id="historyList"></ul>
 
 </div>
-
-<!-- HOTEL DATABASE -->
 
 <div class="section" id="hotelDBSection">
 
@@ -212,8 +193,6 @@ Hotel
 
 </div>
 
-<!-- INCLUSIONS -->
-
 <div class="section">
 
 <h3>Inclusions</h3>
@@ -221,16 +200,12 @@ Hotel
 
 </div>
 
-<!-- EXCLUSIONS -->
-
 <div class="section">
 
 <h3>Exclusions</h3>
 <div id="exclusionsList"></div>
 
 </div>
-
-<!-- ITINERARY -->
 
 <div class="section">
 
@@ -247,21 +222,17 @@ Hotel
 
 <script>
 
-/* DATABASE */
-
-let hotels = JSON.parse(localStorage.getItem("hotelDB")||"[]");
-let templates = JSON.parse(localStorage.getItem("templateDB")||"[]");
-let historyDB = JSON.parse(localStorage.getItem("historyDB")||"[]");
+let hotels=JSON.parse(localStorage.getItem("hotelDB")||"[]");
+let templates=JSON.parse(localStorage.getItem("templateDB")||"[]");
+let historyDB=JSON.parse(localStorage.getItem("historyDB")||"[]");
 
 let optionCount=0;
-
-/* HOTEL OPTION */
 
 function addOption(cityCount){
 
 optionCount++;
 
-let hideSecond = cityCount<=1 ? "style='display:none'" : "";
+let hideSecond=cityCount<=1?"style='display:none'":"";
 
 let div=document.createElement("div");
 
@@ -294,113 +265,180 @@ document.getElementById("optionsArea").appendChild(div);
 
 }
 
-/* HOTEL DB */
+function createList(container,data){
 
-function saveHotel(){
+if(!data||data.length===0)return;
 
-let city=document.getElementById("hotelCity").value;
-let name=document.getElementById("hotelName").value;
+let html="<ul>";
 
-hotels.push({city,name});
+data.forEach(i=>html+="<li>"+i+"</li>");
 
-localStorage.setItem("hotelDB",JSON.stringify(hotels));
+html+="</ul>";
 
-renderHotels();
+container.innerHTML=html;
 
 }
 
-function renderHotels(){
+function buildItinerary(container,data){
 
-let list=document.getElementById("hotelList");
+if(!data||data.length===0){
 
-list.innerHTML="";
+data=[
+"Arrival and hotel check-in",
+"Local sightseeing",
+"Explore major attractions",
+"Optional activities",
+"Leisure day",
+"Departure transfer"
+];
 
-hotels.forEach(h=>{
+}
 
-let li=document.createElement("li");
+let html="";
 
-li.innerText=h.city+" – "+h.name;
+data.forEach((i,n)=>{
 
-list.appendChild(li);
+html+=`<p><span class='itDay'>Day ${n+1}</span> – ${i}</p>`;
 
 });
 
-}
-
-/* TEMPLATE */
-
-function saveTemplate(){
-
-let template={
-
-name:document.getElementById("destination").value+" "+document.getElementById("duration").value,
-
-destination:document.getElementById("destination").value,
-duration:document.getElementById("duration").value,
-inclusions:document.getElementById("inclusionsList").innerHTML,
-exclusions:document.getElementById("exclusionsList").innerHTML,
-itinerary:document.getElementById("itineraryList").innerHTML
-
-};
-
-templates.push(template);
-
-localStorage.setItem("templateDB",JSON.stringify(templates));
-
-renderTemplates();
+container.innerHTML=html;
 
 }
 
-function renderTemplates(){
+function defaultExclusions(){
 
-let list=document.getElementById("templateList");
+return[
+"Airfare unless specified",
+"Personal expenses",
+"Travel insurance",
+"Tips and porterage",
+"Early check-in / late checkout",
+"Anything not mentioned in inclusions"
+];
 
-list.innerHTML="";
+}
 
-templates.forEach((t,i)=>{
+async function runAI(){
 
-let li=document.createElement("li");
+let text=document.getElementById("roughQuote").value;
+let apiKey=document.getElementById("apiKey").value;
 
-li.innerText=t.name;
+let prompt=`
+Extract travel quotation details.
 
-li.onclick=function(){
+Return JSON:
+{
+destination:"",
+arrival_city:"",
+departure_city:"",
+travel_date:"",
+duration:"",
+adults:0,
+children:0,
+options:[{price:"",cities:[{city:"",hotel:""}]}],
+inclusions:[],
+exclusions:[],
+itinerary:[]
+}
 
-document.getElementById("destination").value=t.destination;
-document.getElementById("duration").value=t.duration;
+Text:
+${text}
+`;
 
-document.getElementById("inclusionsList").innerHTML=t.inclusions;
-document.getElementById("exclusionsList").innerHTML=t.exclusions;
-document.getElementById("itineraryList").innerHTML=t.itinerary;
+let response=await fetch("https://api.openai.com/v1/chat/completions",{
 
-};
+method:"POST",
 
-list.appendChild(li);
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+apiKey
+},
+
+body:JSON.stringify({
+
+model:"gpt-4o-mini",
+
+messages:[
+{role:"system",content:"Extract travel quotation"},
+{role:"user",content:prompt}
+]
+
+})
 
 });
 
+let data=await response.json();
+
+let aiText=data.choices[0].message.content;
+
+aiText=aiText.replace(/```json|```/g,"").trim();
+
+let result=JSON.parse(aiText);
+
+fillForm(result);
+
 }
 
-function searchTemplate(){
+function fillForm(result){
 
-let key=document.getElementById("templateSearch").value.toLowerCase();
+document.getElementById("destination").value=result.destination||"";
 
-let list=document.getElementById("templateList");
+document.getElementById("arrivalCity").value=result.arrival_city||"";
 
-list.innerHTML="";
+document.getElementById("departureCity").value=result.departure_city||result.arrival_city;
 
-templates.filter(t=>t.name.toLowerCase().includes(key)).forEach(t=>{
+document.getElementById("travelDate").value=result.travel_date||"";
 
-let li=document.createElement("li");
+document.getElementById("duration").value=result.duration||"";
 
-li.innerText=t.name;
+document.getElementById("adults").value=result.adults||"";
 
-list.appendChild(li);
+document.getElementById("children").value=result.children||"";
+
+document.getElementById("optionsArea").innerHTML="";
+
+optionCount=0;
+
+let cityCount=result.options?.[0]?.cities?.length||1;
+
+result.options.forEach((opt,i)=>{
+
+addOption(cityCount);
+
+let index=i+1;
+
+document.getElementById("priceOption"+index).value=opt.price||"";
+
+if(opt.cities[0]){
+
+document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
+
+document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
+
+}
+
+if(opt.cities[1]){
+
+document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
+
+document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
+
+}
 
 });
 
-}
+createList(document.getElementById("inclusionsList"),result.inclusions);
 
-/* HISTORY */
+let exclusions=result.exclusions?.length?result.exclusions:defaultExclusions();
+
+createList(document.getElementById("exclusionsList"),exclusions);
+
+buildItinerary(document.getElementById("itineraryList"),result.itinerary);
+
+saveHistory();
+
+}
 
 function saveHistory(){
 
@@ -431,76 +469,12 @@ list.appendChild(li);
 });
 
 }
-function fillForm(result){
-
-document.getElementById("destination").value=result.destination||"";
-
-document.getElementById("arrivalCity").value=result.arrival_city||"";
-
-if(result.departure_city){
-document.getElementById("departureCity").value=result.departure_city;
-}else{
-document.getElementById("departureCity").value=result.arrival_city;
-}
-
-document.getElementById("duration").value=result.duration||"";
-document.getElementById("adults").value=result.adults||"";
-document.getElementById("children").value=result.children||"";
-
-document.getElementById("optionsArea").innerHTML="";
-optionCount=0;
-
-let cityCount=result.options?.[0]?.cities?.length || 1;
-
-result.options.forEach((opt,i)=>{
-
-addOption(cityCount);
-
-let index=i+1;
-
-document.getElementById("priceOption"+index).value=opt.price||"";
-
-if(opt.cities[0]){
-
-document.getElementById("city"+index+"_1").value=opt.cities[0].city||"";
-document.getElementById("hotel"+index+"_1").value=opt.cities[0].hotel||"";
-
-}
-
-if(opt.cities[1]){
-
-document.getElementById("city"+index+"_2").value=opt.cities[1].city||"";
-document.getElementById("hotel"+index+"_2").value=opt.cities[1].hotel||"";
-
-}
-
-});
-
-createList(document.getElementById("inclusionsList"),result.inclusions);
-
-let exclusions=result.exclusions?.length?result.exclusions:[
-"Airfare unless specified",
-"Personal expenses",
-"Travel insurance",
-"Tips and porterage",
-"Early check-in / late checkout",
-"Anything not mentioned in inclusions"
-];
-
-createList(document.getElementById("exclusionsList"),exclusions);
-
-buildItinerary(document.getElementById("itineraryList"),result.itinerary);
-
-}
-/* PAGE LOAD */
 
 window.onload=function(){
 
-renderHotels();
-renderTemplates();
-renderHistory();
-
 addOption(1);
+
+renderHistory();
 
 let today=new Date().toISOString().split('T')[0];
 
