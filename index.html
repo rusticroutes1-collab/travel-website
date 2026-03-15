@@ -2,28 +2,29 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AI Travel Quotation Tool</title>
+<title>AI Travel Quotation Mini CRM</title>
 <style>
-body{font-family:Arial;margin:20px;background:#f5f5f5}
+body{font-family:Arial;margin:20px;background:#f4f6f8}
 h2{margin-top:0}
-textarea,input{width:100%;padding:8px;margin:6px 0}
-.section{background:#fff;padding:15px;margin-bottom:15px;border-radius:6px;box-shadow:0 0 4px rgba(0,0,0,0.1)}
+textarea,input,select{width:100%;padding:8px;margin:6px 0}
+.section{background:#fff;padding:15px;margin-bottom:15px;border-radius:6px;box-shadow:0 0 5px rgba(0,0,0,0.08)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 button{padding:10px 14px;margin-top:10px;border:none;background:#0077cc;color:white;border-radius:4px;cursor:pointer}
 button:hover{background:#005fa3}
 
+ul{margin:6px 0 0 18px}
+
+/* hide input area when printing */
 @media print{
 #inputSection{display:none}
 button{display:none}
 textarea,input{border:none}
 }
-
-ul{margin:5px 0 0 18px}
 </style>
 </head>
 <body>
 
-<h2>AI Travel Quotation Generator</h2>
+<h2>AI Travel Quotation Mini CRM</h2>
 
 <div class="section" id="inputSection">
 <label>Paste Rough Quotation / WhatsApp Text</label>
@@ -71,36 +72,10 @@ ul{margin:5px 0 0 18px}
 </div>
 </div>
 
-<div class="section">
-<h3>Hotel Option 1</h3>
-Price
-<input id="priceOption1">
-
-City
-<input id="opt1city1" list="hotelMemory">
-Hotel
-<input id="opt1hotel1" list="hotelMemory">
-
-City
-<input id="opt1city2" list="hotelMemory">
-Hotel
-<input id="opt1hotel2" list="hotelMemory">
-</div>
-
-<div class="section">
-<h3>Hotel Option 2</h3>
-Price
-<input id="priceOption2">
-
-City
-<input id="opt2city1" list="hotelMemory">
-Hotel
-<input id="opt2hotel1" list="hotelMemory">
-
-City
-<input id="opt2city2" list="hotelMemory">
-Hotel
-<input id="opt2hotel2" list="hotelMemory">
+<div class="section" id="optionsContainer">
+<h3>Hotel Options</h3>
+<div id="optionsArea"></div>
+<button onclick="addOption()">Add Hotel Option</button>
 </div>
 
 <datalist id="hotelMemory"></datalist>
@@ -126,10 +101,10 @@ Hotel
 
 <script>
 
-/* LOAD SAVED API KEY */
+/* API KEY MEMORY */
 document.getElementById("apiKey").value = localStorage.getItem("openaiKey") || "";
 
-/* LOAD HOTEL MEMORY */
+/* HOTEL DATABASE */
 function loadHotelMemory(){
 let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
 let list = document.getElementById("hotelMemory");
@@ -142,12 +117,8 @@ list.appendChild(opt);
 });
 }
 
-loadHotelMemory();
-
-/* SAVE HOTEL MEMORY */
 function rememberHotel(name){
 if(!name) return;
-
 let hotels = JSON.parse(localStorage.getItem("hotelMemory") || "[]");
 
 if(!hotels.includes(name)){
@@ -157,6 +128,43 @@ localStorage.setItem("hotelMemory",JSON.stringify(hotels));
 
 loadHotelMemory();
 }
+
+loadHotelMemory();
+
+/* OPTION BUILDER */
+let optionCount=0;
+
+function addOption(){
+
+optionCount++;
+
+let div=document.createElement("div");
+
+div.className="section";
+
+div.id="option"+optionCount;
+
+div.innerHTML=`
+<h4>Option ${optionCount}</h4>
+Price
+<input id="priceOption${optionCount}">
+
+City
+<input id="city${optionCount}_1">
+Hotel
+<input id="hotel${optionCount}_1" list="hotelMemory">
+
+City
+<input id="city${optionCount}_2">
+Hotel
+<input id="hotel${optionCount}_2" list="hotelMemory">
+`;
+
+document.getElementById("optionsArea").appendChild(div);
+}
+
+/* INITIAL OPTION */
+addOption();
 
 async function runAI(){
 
@@ -179,11 +187,6 @@ Return JSON only.
 "options":[
 {
 "name":"Option 1",
-"price":"",
-"cities":[{"city":"","hotel":"","nights":0}]
-},
-{
-"name":"Option 2",
 "price":"",
 "cities":[{"city":"","hotel":"","nights":0}]
 }
@@ -269,44 +272,44 @@ document.getElementById("adults").value=result.adults;
 if(result.children)
 document.getElementById("children").value=result.children;
 
-if(result.options && result.options.length){
+if(result.options){
 
-let opt1=result.options[0];
-let opt2=result.options[1];
+result.options.forEach((opt,i)=>{
 
-if(opt1){
-document.getElementById("priceOption1").value=opt1.price||"";
+if(i>=optionCount) addOption();
 
-if(opt1.cities && opt1.cities.length){
+let index=i+1;
 
-document.getElementById("opt1city1").value=opt1.cities[0]?.city||"";
-document.getElementById("opt1hotel1").value=opt1.cities[0]?.hotel||"";
-rememberHotel(opt1.cities[0]?.hotel);
+if(opt.price)
+document.getElementById("priceOption"+index).value=opt.price;
 
-if(opt1.cities[1]){
-document.getElementById("opt1city2").value=opt1.cities[1].city||"";
-document.getElementById("opt1hotel2").value=opt1.cities[1].hotel||"";
-rememberHotel(opt1.cities[1].hotel);
+if(opt.cities){
+
+if(opt.cities[0]){
+
+let c1=opt.cities[0];
+
+document.getElementById("city"+index+"_1").value=c1.city||"";
+
+document.getElementById("hotel"+index+"_1").value=c1.hotel||"";
+
+rememberHotel(c1.hotel);
 }
-}
+
+if(opt.cities[1]){
+
+let c2=opt.cities[1];
+
+document.getElementById("city"+index+"_2").value=c2.city||"";
+
+document.getElementById("hotel"+index+"_2").value=c2.hotel||"";
+
+rememberHotel(c2.hotel);
 }
 
-if(opt2){
-document.getElementById("priceOption2").value=opt2.price||"";
-
-if(opt2.cities && opt2.cities.length){
-
-document.getElementById("opt2city1").value=opt2.cities[0]?.city||"";
-document.getElementById("opt2hotel1").value=opt2.cities[0]?.hotel||"";
-rememberHotel(opt2.cities[0]?.hotel);
-
-if(opt2.cities[1]){
-document.getElementById("opt2city2").value=opt2.cities[1].city||"";
-document.getElementById("opt2hotel2").value=opt2.cities[1].hotel||"";
-rememberHotel(opt2.cities[1].hotel);
 }
-}
-}
+
+});
 
 }
 
